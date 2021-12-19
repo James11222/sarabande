@@ -5,7 +5,7 @@ import time
 
 class measure:
     
-    def __init__(self, density_field_data = None, save_dir=None, save_name=None, ell_max=5,
+    def __init__(self, nPCF=4, projected=False, density_field_data = None, save_dir=None, save_name=None, ell_max=5,
                  nbins=4, bin_spacing='LIN', ld_one_d=64, bin_min=1, bin_max=32,
                  physical_boxsize = None, rmin = None, rmax = None):
         """
@@ -16,6 +16,13 @@ class measure:
         self.bin_min = bin_min-1e-5
         self.bin_max = bin_max+1e-5
         self.nbins = nbins
+        self.projected = projected
+        
+        if nPCF == 3 or nPCF == 4:
+            self.nPCF = nPCF
+        else:
+            raise ValueError("Sarabande only calculates 3 or 4 point correlation functions. Please give an integer 3 or 4.")
+
         
         if physical_boxsize or rmin or rmax is not None:
             if physical_boxsize and rmin and rmax is not None:
@@ -29,7 +36,7 @@ class measure:
             switch = {
             'LIN' : np.linspace(self.bin_min, self.bin_max, self.nbins+1),
             'INV' : 1./np.linspace(1./self.bin_min, 1./self.bin_max, self.nbins+1),
-            'LOG' : np.exp(np.linspace(np.log(self.bin_min), np.log(self.bin_max),                      self.nbins+1))}
+            'LOG' : np.exp(np.linspace(np.log(self.bin_min), np.log(self.bin_max), self.nbins+1))}
         else:
             raise ValueError("""Please put a valid bin_spacing argument, acceptable options are: \n LIN \n INV \n LOG \n in string format.""")
         
@@ -37,7 +44,13 @@ class measure:
         self.ld_one_d = ld_one_d
         
         if density_field_data is not None:
-            self.density_field_data = density_field_data
+            if len(np.shape(density_field_data)) == 3 and self.projected == True:
+                raise AssertionError("""Projected 3/4 PCFs can only be computed on a 2D data set, use full 3/4 PCFs for 3D data sets.""")
+            elif len(np.shape(density_field_data)) == 2 and self.projected == False:
+                raise AssertionError("""Projected 3/4 PCFs can only be computed on a 2D data set, use full 3/4 PCFs for 3D data sets.""")
+            else:
+                self.density_field_data = density_field_data
+            
         else:
             raise ValueError("Please include a density_field_data argument. Should be a density cube in the form of a numpy array")
         
