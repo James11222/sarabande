@@ -2,6 +2,7 @@ import numpy as np
 from subprocess import call
 import astropy.io.fits as pyf
 import time
+from .utils import *
 
 class measure:
     
@@ -9,7 +10,7 @@ class measure:
                  nbins=4, bin_spacing='LIN', ld_one_d=64, bin_min=1, bin_max=32,
                  physical_boxsize = None, rmin = None, rmax = None):
         """
-        This class allows us to measure the 4pcf from some input data field
+        This class allows us to measure the 3/4pcf from some input data field
         """
         self.ell_max = ell_max
         self.eps = 1e-15
@@ -17,6 +18,10 @@ class measure:
         self.bin_max = bin_max+1e-5
         self.nbins = nbins
         self.projected = projected
+        
+        ####################################
+        #   Initialization Case Handling
+        ####################################
         
         if nPCF == 3 or nPCF == 4:
             self.nPCF = nPCF
@@ -52,7 +57,10 @@ class measure:
                 self.density_field_data = density_field_data
             
         else:
-            raise ValueError("Please include a density_field_data argument. Should be a density cube in the form of a numpy array")
+            if self.projected == True:
+                raise ValueError("Please include a density_field_data argument. Should be a density sheet in the form of a numpy array")
+            else:
+                raise ValueError("Please include a density_field_data argument. Should be a density cube in the form of a numpy array")
         
         if save_name is not None:
             self.save_name = save_name
@@ -63,4 +71,6 @@ class measure:
             self.save_dir = save_dir
         else:
             raise ValueError("Please include a save_dir argument")
+            
+    
     

@@ -1,3 +1,8 @@
+import numpy as np
+from subprocess import call
+import astropy.io.fits as pyf
+import time
+
 def test_print():
     print("a simple function to make sure this module works.")
     
@@ -55,7 +60,6 @@ def ylm_transform_save(measure_obj, ylm_on_shell, ell, m, i):
     del FT
 
 def calc_and_save_YLMs(measure_obj):
-
     """
     COMPUTE YLMS SEQUENTIALLY AND SAVE.
     xmiydivr = e^(-iφ)sin(θ) = (x - iy)/r
@@ -72,11 +76,11 @@ def calc_and_save_YLMs(measure_obj):
         Z = measure_obj.Z
         R = measure_obj.R
     else:
-        raise AssertionError("You need to run measure_obj.create_XYZR() first")
+        raise AssertionError("You need to run create_XYZR() first")
 
     #ell, m = 0,0
     y00 =.5*(1./np.pi)**.5*np.ones((measure_obj.ld_one_d,measure_obj.ld_one_d,measure_obj.ld_one_d))
-    measure_obj.ylm_save(y00, 0, 0)
+    ylm_save(measure_obj,y00, 0, 0)
     del y00
 
     #ell, m = 1, -1
@@ -86,25 +90,25 @@ def calc_and_save_YLMs(measure_obj):
     del Y
     xmiydivr = xdivr - 1j*ydivr
     y1m1 = .5*np.sqrt(3./(2.*np.pi))*xmiydivr
-    measure_obj.ylm_save(y1m1, 1, 1)
+    ylm_save(measure_obj,y1m1, 1, 1)
     del y1m1
 
     #ell, m = 1, 0
     zdivr = Z/R
     del Z
     y10 = .5*np.sqrt(3./np.pi)*zdivr
-    measure_obj.ylm_save(y10, 1, 0)
+    ylm_save(measure_obj,y10, 1, 0)
     del y10
 
     #ell, m = 2, -2
     xmiydivrsq = xmiydivr*xmiydivr
     y2m2 = .25*np.sqrt(15./(2.*np.pi))*xmiydivrsq
-    measure_obj.ylm_save(y2m2, 2, 2)
+    ylm_save(measure_obj,y2m2, 2, 2)
     del y2m2
 
     #ell, m = 2, -1
     y2m1 = .5*np.sqrt(15./(2.*np.pi))*xmiydivr*zdivr
-    measure_obj.ylm_save(y2m1, 2, 1)
+    ylm_save(measure_obj,y2m1, 2, 1)
     del y2m1
 
     #ell, m = 2, 0
@@ -112,88 +116,88 @@ def calc_and_save_YLMs(measure_obj):
     ydivrsq = ydivr*ydivr
     zdivrsq = zdivr*zdivr
     y20 = .25*np.sqrt(5./np.pi)*(2.*zdivrsq-xdivrsq-ydivrsq)
-    measure_obj.ylm_save(y20, 2, 0)
+    ylm_save(measure_obj,y20, 2, 0)
     del y20
 
     #ell, m = 3, -3
     xmiydivrcu = xmiydivr*xmiydivrsq
     y3m3 = .125*np.sqrt(35./np.pi)*xmiydivrcu
-    measure_obj.ylm_save(y3m3, 3, 3)
+    ylm_save(measure_obj,y3m3, 3, 3)
     del y3m3
 
     #ell, m = 3, -2
     y3m2 = .25*np.sqrt(105./(2.*np.pi))*xmiydivrsq*zdivr
-    measure_obj.ylm_save(y3m2, 3, 2)
+    ylm_save(measure_obj,y3m2, 3, 2)
     del y3m2
 
     #ell, m = 3, -1
     y3m1 = .125*np.sqrt(21./np.pi)*(xmiydivr*(4.*zdivrsq-xdivrsq-ydivrsq))
-    measure_obj.ylm_save(y3m1, 3, 1)
+    ylm_save(measure_obj,y3m1, 3, 1)
     del y3m1
 
     #ell, m = 3, 0
     y30 = .25*np.sqrt(7./np.pi)*(zdivr*(2.*zdivrsq-3.*xdivrsq-3.*ydivrsq))
-    measure_obj.ylm_save(y30, 3, 0)
+    ylm_save(measure_obj,y30, 3, 0)
     del y30
 
     #ell, m = 4, -4
     xmiydivrft = xmiydivr*xmiydivrcu
     y4m4 = .1875*np.sqrt(35./(2.*np.pi))*xmiydivrft
-    measure_obj.ylm_save(y4m4, 4, 4)
+    ylm_save(measure_obj,y4m4, 4, 4)
     del y4m4
 
     #ell, m = 4, -3
     y4m3 = .375*np.sqrt(35./np.pi)*xmiydivrcu*zdivr
-    measure_obj.ylm_save(y4m3, 4, 3)
+    ylm_save(measure_obj,y4m3, 4, 3)
     del y4m3
 
     #ell, m = 4, -2
     y4m2 = .375*np.sqrt(5./(2.*np.pi))*xmiydivrsq*(7.*zdivrsq-1)
-    measure_obj.ylm_save(y4m2, 4, 2)
+    ylm_save(measure_obj,y4m2, 4, 2)
     del y4m2
 
     #ell, m = 4, -1
     y4m1 = .375*np.sqrt(5./np.pi)*xmiydivr*zdivr*(7.*zdivrsq-3.)
-    measure_obj.ylm_save(y4m1, 4, 1)
+    ylm_save(measure_obj,y4m1, 4, 1)
     del y4m1
 
     #ell, m = 4, 0
     zdivrft = zdivrsq*zdivrsq
     y40 = .1875*np.sqrt(1./np.pi)*(35.*zdivrft-30.*zdivrsq+3.)
-    measure_obj.ylm_save(y40, 4, 0)
+    ylm_save(measure_obj,y40, 4, 0)
     del y40
 
     #ell, m = 5, -5
     xmiydivrfi = xmiydivr*xmiydivrft
     y5m5 = (3./32.)*np.sqrt(77./np.pi)*xmiydivrfi
-    measure_obj.ylm_save(y5m5, 5, 5)
+    ylm_save(measure_obj,y5m5, 5, 5)
     del y5m5
 
     #ell, m = 5, -4
     y5m4 = (3./16.)*np.sqrt(385./(2.*np.pi))*xmiydivrft*zdivr 
-    measure_obj.ylm_save(y5m4, 5, 4)
+    ylm_save(measure_obj,y5m4, 5, 4)
     del y5m4
 
     #ell, m = 5, -3
     y5m3 = (1./32.)*np.sqrt(385./np.pi)*xmiydivrcu*(9.*zdivrsq-1.)
-    measure_obj.ylm_save(y5m3, 5, 3)
+    ylm_save(measure_obj,y5m3, 5, 3)
     del y5m3
 
     #ell, m = 5, -2
     zdivrcu = zdivr*zdivrsq
     y5m2 = (1./8.)*np.sqrt(1155./(2.*np.pi))*xmiydivrsq*(3.*zdivrcu-zdivr)
-    measure_obj.ylm_save(y5m2, 5, 2)
+    ylm_save(measure_obj,y5m2, 5, 2)
     del y5m2
 
     #ell, m = 5, -1
     y5m1 = (1./16.)*np.sqrt(165./(2.*np.pi))*xmiydivr*(21.*zdivrft-14.*zdivrsq+1.)
-    measure_obj.ylm_save(y5m1, 5, 1)
+    ylm_save(measure_obj,y5m1, 5, 1)
     del y5m1
 
     #ell, m = 5, 0
     zdivrfi = zdivr*zdivrft
     y50 = (1./16.)*np.sqrt(11./np.pi)*(63.*zdivrfi-70.*zdivrcu+15.*zdivr)
-    measure_obj.ylm_save(y50, 5, 0)
+    ylm_save(measure_obj,y50, 5, 0)
     del y50
 
 def create_radial_bins(measure_obj, save_bin_info=True):
@@ -231,7 +235,7 @@ def bin_spherical_harmonics(measure_obj,verbose=True):
                 ylm_on_shell = np.zeros((measure_obj.ld_one_d, measure_obj.ld_one_d, measure_obj.ld_one_d)) + 0j
                 ylm_on_shell[rib] = ylm[rib]
                 del rib
-                measure_obj.ylm_transform_save(ylm_on_shell, ell, m, i)
+                ylm_transform_save(measure_obj,ylm_on_shell, ell, m, i)
                 del ylm_on_shell
             if 'ylm' in globals():
                 del ylm
@@ -291,4 +295,68 @@ def calc_a_lm_coeffs(measure_obj,verbose=True, kernel_name = None):
 
     else:
         raise AssertionError("You need to run measure_obj.calc_ft_data() first")
+        
+        
+        
+def prepare_data(measure_obj, verbose_flag=True):
+        """
+        The flag arguments indicate what you have already calculated. 
+        You may want to skip the ylm or alm creation steps if you've 
+        already calculated them.
+        """
+        if verbose_flag:
+            print("Creating XYZ Grids for radial bin and ylm creation ... \n")
+        create_XYZR(measure_obj)
+        
+        if verbose_flag:
+            print("Creating radial bins ... \n")
+        create_radial_bins(measure_obj)
+        
+        if verbose_flag:
+            print("taking the fourier transform of data ... \n")
+        calc_ft_data(measure_obj)
+        
+        if verbose_flag:
+            print("calculating YLM Coefficients ... \n")
+        calc_and_save_YLMs(measure_obj)
+        
+        if verbose_flag:
+            print("binning spherical harmonics ... \n")
+        bin_spherical_harmonics(measure_obj,verbose=verbose_flag)
+        
+        if verbose_flag:
+            print("calculating a_lm coefficients ... \n")
+        calc_a_lm_coeffs(measure_obj, verbose=verbose_flag, kernel_name=measure_obj.save_name)
+        
+#         if calc_ylm_flag:
+#             if bin_ylm_flag:
+#                 if alm_flag:
+#                     measure_obj.kernel_name = measure_obj.save_name
+#                     measure_obj.calc_zeta()
+#                 else:
+#                     measure_obj.calc_a_lm_coeffs(verbose=verbose_flag, kernel_name=measure_obj.save_name)
+#                     measure_obj.calc_zeta()
+#             else:
+#                 measure_obj.bin_spherical_harmonics(verbose=verbose_flag)
+#                 if alm_flag:
+#                     measure_obj.calc_zeta()
+#                 else:
+#                     measure_obj.calc_a_lm_coeffs(verbose=verbose_flag, kernel_name=measure_obj.save_name)
+#                     measure_obj.calc_zeta()
+              
+#         else:
+#             measure_obj.calc_and_save_YLMs()
+#             if bin_ylm_flag:
+#                 if alm_flag:
+#                     measure_obj.calc_zeta()
+#                 else:
+#                     measure_obj.calc_a_lm_coeffs(verbose=verbose_flag, kernel_name=measure_obj.save_name)
+#                     measure_obj.calc_zeta()
+#             else:
+#                 measure_obj.bin_spherical_harmonics(verbose=verbose_flag)
+#                 if alm_flag:
+#                     measure_obj.calc_zeta()
+#                 else:
+#                     measure_obj.calc_a_lm_coeffs(verbose=verbose_flag, kernel_name=measure_obj.save_name)
+#                     measure_obj.calc_zeta()
 
