@@ -6,6 +6,16 @@ import time
 def test_print():
     print("a simple function to make sure this module works.")
     
+def calc_ft_data(measure_obj, normalized=False):
+    """
+    This function takes the fourier transform of the data
+    """
+    data = measure_obj.density_field_data
+    if normalized:
+        data = (np.log(data) - np.mean(np.log(data)))/np.std(np.log(data))
+    ft_data = np.fft.fftn(data)
+    measure_obj.ft_data = ft_data
+    
 
 ################################################################
 #                         FULL 3/4 UTILITIES
@@ -246,15 +256,7 @@ def bin_spherical_harmonics(measure_obj,verbose=True):
     call('rm ' + measure_obj.save_dir + 'ylm_' + measure_obj.save_name + '*', shell=True)
 
 
-def calc_ft_data(measure_obj, normalized=False):
-    """
-    This function takes the fourier transform of the data
-    """
-    data = measure_obj.density_field_data
-    if normalized:
-        data = (np.log(data) - np.mean(np.log(data)))/np.std(np.log(data))
-    ft_data = np.fft.fftn(data)
-    measure_obj.ft_data = ft_data
+
 
 def calc_a_lm_coeffs(measure_obj,verbose=True, kernel_name = None):
     """
@@ -360,4 +362,110 @@ def prepare_data(measure_obj, verbose_flag):
 #                 else:
 #                     measure_obj.calc_a_lm_coeffs(verbose=verbose_flag, kernel_name=measure_obj.save_name)
 #                     measure_obj.calc_zeta()
+
+
+################################################################
+#                 Projected 3/4 UTILITIES
+################################################################
+
+def projected_create_bins(measure_obj):
+    x = np.linspace(-measure_obj.ld_one_d/2, measure_obj.ld_one_d/2-1 , measure_obj.ld_one_d)
+    xsq = x*x
+    m_center = np.where(x==0)[0]# one coordinate of mesh center. this will not work well for odd mesh sizes.
+    X, Y = np.meshgrid(x, x, indexing='ij')
+    X = -X
+    Y = -Y
+    Xsq, Ysq = np.meshgrid(xsq, xsq, indexing='ij')
+
+
+    #PRECOMPUTE POWERS OF ARRAYS AND COMBINATIONS (e.g. x - iy).
+
+    Rsq = Xsq+Ysq
+    R = np.sqrt(Rsq)
+    del Rsq
+    zero_ind = np.where(R==0)
+    R[zero_ind] = measure_obj.eps
+    X[zero_ind] = measure_obj.eps
+    Y[zero_ind] = measure_obj.eps
+    del zero_ind
+
+
+    #COMPUTE COMPLEX EXPONENTIALS SEQUENTIALLY
+    #compute base quantity (x + iy)/r
+
+    xdivr = X/R
+    del X
+    ydivr = Y/R #we'll need these as individuals later anyway.
+    del Y
+    xpiydivr = xdivr + 1j*ydivr
+    measure_obj.xpiydivr = xpiydivr
+    measure_obj.R = R
+
+    boundsandnumber = np.zeros((2, measure_obj.nbins+1))
+    boundsandnumber[0,:] = measure_obj.bin_edges
+    for i in range(measure_obj.nbins):
+        boundsandnumber[1,i] = np.sum(np.logical_and(R >= measure_obj.bin_edges[i], R < measure_obj.bin_edges[i+1]))
+        
+    measure_obj.boundsandnumber = boundsandnumber
+    
+    
+    
+def projected_create_kernels(measure_obj):
+    def exp_imtheta_FFT(exp_imtheta, i):
+        #note, you have to pass the mth exp_imtheta to this to reduce data transfer overhead
+        bin_min = measure_obj.bin_edges[i]
+        bin_max = measure_obj.bin_edges[i+1]
+        rib = np.where((measure_obj.R >= bin_min) & (measure_obj.R < bin_max))
+        exp_imtheta_on_shell = np.zeros((measure_obj.ld_one_d, measure_obj.ld_one_d)) + 0j
+        exp_imtheta_on_shell[rib] = exp_imtheta[rib]
+        return np.fft.fftn(np.fft.fftshift(exp_imtheta_on_shell))
+
+
+    exp_imtheta_M = [measure_obj.xpiydivr**m for m in range(0, measure_obj.m_max + 1)]
+
+    #NOW SET UP RADIAL BINS. SET UP BINS, THEN LOAD  YLM, ZERO IT OUT OUTSIDE THE BIN, AND THEN FT AND SAVE.
+    exp_imtheta_FFT_M=[exp_imtheta_FFT(exp_imtheta_M[m],i) for m in range(0, measure_obj.m_max+1) for i in range(measure_obj.nbins)]
+    exp_imtheta_FFT_M.append(measure_obj.m_max)
+    exp_imtheta_FFT_M.append(measure_obj.nbins)
+
+    #finished kernel
+    measure_obj.kernel=exp_imtheta_FFT_M 
+    
+def projected_create_Cm_coeffs(measure_obj):
+    #Compute c_m coefficients
+    conv_M = [] 
+    for m in range(0, measure_obj.m_max+1):
+        for i in range(measure_obj.nbins):
+            conv_m = np.fft.ifftn(measure_obj.ft_data*measure_obj.kernel[i+m*measure_obj.nbins])
+            conv_M.append(conv_m)
+            
+    measure_obj.conv_M = conv_M
+
+    
+def projected_prepare_data(measure_obj, verbose_flag):
+    """
+    The flag arguments indicate what you have already calculated. 
+    You may want to skip the ylm or alm creation steps if you've 
+    already calculated them.
+    """
+    if verbose_flag:
+        print("Creating Radial Bins ... \n")
+    projected_create_bins(measure_obj)
+
+    if verbose_flag:
+        print("Creating kernels ... \n")
+    projected_create_kernels(measure_obj)
+
+    if verbose_flag:
+        print("taking the fourier transform of data ... \n")
+    calc_ft_data(measure_obj)
+
+    if verbose_flag:
+        print("calculating C_m Coefficients ... \n")
+    projected_create_Cm_coeffs(measure_obj)
+
+
+
+    
+    
 
