@@ -2,21 +2,28 @@ import numpy as np
 from subprocess import call
 import astropy.io.fits as pyf
 import time
+import pkg_resources
 from .utils import *
 
-def calc_zeta(measure_obj, normalize=True)
+def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False):
     
-    print("""Preparing the data:""")
-    prepare_data(measure_obj)
+    if not skip_prepare:
+        print("""Preparing the data:""")
+        prepare_data(measure_obj,verbose_flag)
+    else:
+        measure_obj.kernel_name = measure_obj.save_name
+        measure_obj.boundsandnumber = np.load(measure_obj.save_dir + 'bin_bounds_and_pixel_number_'+measure_obj.save_name+'.npy')
+        
 
     if measure_obj.nPCF == 3:
+        start = time.time()
         
         #load alms (results of convolution at fixed ell and for all m, to combine).
         zeta = np.zeros((measure_obj.ell_max + 1, measure_obj.nbins, measure_obj.nbins)) + 0j
 
         for l in range(0, measure_obj.ell_max+1, 1):
             for bin1 in range(0, measure_obj.nbins, 1):
-                for bin2 in range(0, measure_obj.bin1+1, 1):
+                for bin2 in range(0, bin1+1, 1):
                     for m in range(0,l+1, 1):
                         #load b1 and b2 at this m
                        
@@ -29,7 +36,7 @@ def calc_zeta(measure_obj, normalize=True)
                         del ylm_b2
 
                         #average spatially now.
-                        ylm_avg = np.sum(data*ylm_b1)
+                        ylm_avg = np.sum(measure_obj.density_field_data*ylm_b1)
                         del ylm_b1
                         # add in negative m: so basically we are computing m's in sum term by
                         # term but with matching between + and - m.
@@ -43,15 +50,19 @@ def calc_zeta(measure_obj, normalize=True)
             for bin1 in range(0, measure_obj.nbins, 1):
                 for bin2 in range(bin1+1, measure_obj.nbins, 1): #?? for bin2 in range(0, bin2<=bin1, 1):
                     zeta[l, bin1, bin2] = zeta[l, bin2, bin1]
+        
                     
         
         if normalize==True:
-            binvolume = measure_obj.boundsandnumber[1,0:nbins]
-            zeta /= (binvolume[:,None] * binvolume[None,:])
-            return zeta
+            binvolume = measure_obj.boundsandnumber[1,0:measure_obj.nbins]
+            normedzeta = zeta / (binvolume[:,None] * binvolume[None,:])
+            measure_obj.zeta = normedzeta
             
         else:
-            return zeta
+            measure_obj.zeta = zeta
+            
+        end = time.time()
+        print("3PCF took {0:0.4f} seconds to finish".format(end - start))
             
             
                     
@@ -94,7 +105,9 @@ def calc_zeta(measure_obj, normalize=True)
         print("Executing 4PCF Calculation ...")
 
         zeta = np.zeros((ell_max+1, ell_max+1, ell_max+1,nbins, nbins, nbins)) + 0j
-        CG_Coefficients = np.load("CG_Coeffs.npy")
+        
+        stream = pkg_resources.resource_stream(__name__, 'utils/CG_Coeffs.npy')
+        CG_Coefficients = np.load(stream)
         for l_1 in range(0,ell_max+1):
             for l_2 in range(0,ell_max+1):
                 for l_3 in range(np.abs(l_1 - l_2), min(l_1 + l_2, ell_max)+1):
@@ -164,7 +177,7 @@ def calc_zeta(measure_obj, normalize=True)
             #normalize_coeff = (binvolume[:,None, None] * binvolume[None,:, None] * binvolume[None, None, :])
             normalize_coeff = (4.*np.pi)**(3.)
             zeta = (normalize_coeff*zeta/((measure_obj.ld_one_d**3)))
-            return zeta
+            measure_obj.zeta = zeta
         else: 
             print("your zeta coefficients are not properly ormalized.")
-            return zeta    
+            measure_obj.zeta = zeta    

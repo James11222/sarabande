@@ -285,7 +285,8 @@ def calc_a_lm_coeffs(measure_obj,verbose=True, kernel_name = None):
                     conv = np.fft.ifftn(measure_obj.ft_data*bsph_kernel)
                     del bsph_kernel
                     #a_lm^b coefficients saved here
-                    conv /= binvolume[bin]
+                    if measure_obj.nPCF == 4:
+                        conv /= binvolume[bin]
                     np.save(measure_obj.save_dir + measure_obj.save_name+
                             'conv_data_kernel_'+measure_obj.kernel_name+'_'+str(l)+'_'+str(m)+
                           '_bin_'+str(bin)+'.npy', conv)
@@ -298,7 +299,7 @@ def calc_a_lm_coeffs(measure_obj,verbose=True, kernel_name = None):
         
         
         
-def prepare_data(measure_obj, verbose_flag=True):
+def prepare_data(measure_obj, verbose_flag):
         """
         The flag arguments indicate what you have already calculated. 
         You may want to skip the ylm or alm creation steps if you've 

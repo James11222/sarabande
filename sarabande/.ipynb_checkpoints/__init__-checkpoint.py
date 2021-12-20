@@ -17,8 +17,9 @@ import astropy.io.fits as pyf
 import time
 from .utils import *
 from .main import measure
+from .full_PCF import calc_zeta
 
-__uri__ = "https://PIPS.readthedocs.io" 
+__uri__ = "pending" 
 __author__ = "J. Sunseri"
 __maintainer__ = "J. Sunseri"
 __email__ = "jamessunseri@berkeley.edu"
@@ -34,7 +35,7 @@ def about():
     text += "Version: " + __version__ + '\n'
     text += "Authors: " + __author__ + '\n'
     text += "-------------------------------\n"
-    text += "Download the latest version from: https://pypi.org/project/sarabande\n"
+    text += "Download the latest version from: pending\n"
     text += "Report issues to: https://github.com/James11222/sarabande\n"
     text += "Read the documentations at: " + __uri__ + '\n'
     text += "-------------------------------\n"
