@@ -331,37 +331,6 @@ def prepare_data(measure_obj, verbose_flag):
             print("calculating a_lm coefficients ... \n")
         calc_a_lm_coeffs(measure_obj, verbose=verbose_flag, kernel_name=measure_obj.save_name)
         
-#         if calc_ylm_flag:
-#             if bin_ylm_flag:
-#                 if alm_flag:
-#                     measure_obj.kernel_name = measure_obj.save_name
-#                     measure_obj.calc_zeta()
-#                 else:
-#                     measure_obj.calc_a_lm_coeffs(verbose=verbose_flag, kernel_name=measure_obj.save_name)
-#                     measure_obj.calc_zeta()
-#             else:
-#                 measure_obj.bin_spherical_harmonics(verbose=verbose_flag)
-#                 if alm_flag:
-#                     measure_obj.calc_zeta()
-#                 else:
-#                     measure_obj.calc_a_lm_coeffs(verbose=verbose_flag, kernel_name=measure_obj.save_name)
-#                     measure_obj.calc_zeta()
-              
-#         else:
-#             measure_obj.calc_and_save_YLMs()
-#             if bin_ylm_flag:
-#                 if alm_flag:
-#                     measure_obj.calc_zeta()
-#                 else:
-#                     measure_obj.calc_a_lm_coeffs(verbose=verbose_flag, kernel_name=measure_obj.save_name)
-#                     measure_obj.calc_zeta()
-#             else:
-#                 measure_obj.bin_spherical_harmonics(verbose=verbose_flag)
-#                 if alm_flag:
-#                     measure_obj.calc_zeta()
-#                 else:
-#                     measure_obj.calc_a_lm_coeffs(verbose=verbose_flag, kernel_name=measure_obj.save_name)
-#                     measure_obj.calc_zeta()
 
 
 ################################################################
@@ -423,14 +392,6 @@ def projected_create_kernels(measure_obj):
 
     exp_imtheta_M = [measure_obj.xpiydivr**m for m in range(0, measure_obj.m_max + 1)]
 
-#     #NOW SET UP RADIAL BINS. SET UP BINS, THEN LOAD  YLM, ZERO IT OUT OUTSIDE THE BIN, AND THEN FT AND SAVE.
-#     exp_imtheta_FFT_M=[exp_imtheta_FFT(exp_imtheta_M[m],i) for m in range(0, measure_obj.m_max+1) for i in range(measure_obj.nbins)]
-#     exp_imtheta_FFT_M.append(measure_obj.m_max)
-#     exp_imtheta_FFT_M.append(measure_obj.nbins)
-
-#     #finished kernel
-#     measure_obj.kernel=exp_imtheta_FFT_M 
-
     #NOW SET UP RADIAL BINS. SET UP BINS, THEN LOAD  YLM, ZERO IT OUT OUTSIDE THE BIN, AND THEN FT AND SAVE.
     exp_imtheta_FFT_M = np.zeros((measure_obj.m_max+1, measure_obj.nbins, 
                                   measure_obj.ld_one_d, measure_obj.ld_one_d)) + 0j
@@ -444,15 +405,6 @@ def projected_create_kernels(measure_obj):
     measure_obj.kernel=exp_imtheta_FFT_M 
     
 def projected_create_Cm_coeffs(measure_obj):
-#     #Compute c_m coefficients
-#     conv_M = [] 
-#     for m in range(0, measure_obj.m_max+1):
-#         for i in range(measure_obj.nbins):
-#             conv_m = np.fft.ifftn(measure_obj.ft_data*measure_obj.kernel[i+m*measure_obj.nbins])
-#             conv_M.append(conv_m)
-            
-#     measure_obj.conv_M = conv_M
-    
     
     #Compute c_m coefficients
     conv_M = np.zeros((measure_obj.m_max+1, measure_obj.nbins,

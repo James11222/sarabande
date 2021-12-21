@@ -6,8 +6,9 @@ from .utils import *
 
 class measure:
     
-    def __init__(self, nPCF=4, projected=False, m_max=None, density_field_data = None, save_dir=None, save_name=None, ell_max=5,
-                 nbins=4, bin_spacing='LIN',bin_min=1, physical_boxsize = None, rmin = None, rmax = None):
+    def __init__(self, nPCF=4, projected=False, m_max=None, density_field_data = None, 
+                 save_dir=None, save_name=None, ell_max=5, nbins=4, bin_spacing='LIN',
+                 bin_min=1, physical_boxsize = None, rmin = None, rmax = None):
         """
         This class allows us to measure the 3/4pcf from some input data field
         """
@@ -18,6 +19,7 @@ class measure:
         self.ld_one_d = np.shape(density_field_data)[0]
         self.bin_min = bin_min-1e-5
         self.bin_max = (self.ld_one_d // 2) + 1e-5
+        
         ####################################
         #   Initialization Case Handling
         ####################################
