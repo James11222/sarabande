@@ -23,13 +23,21 @@ def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False
             
         if measure_obj.nPCF == 3:
             # PCF_computed_1d = []
-            PCF_computed = np.zeros((measure_obj.nbins, measure_obj.nbins, measure_obj.m_max))
+            # PCF_computed = np.zeros((measure_obj.nbins, measure_obj.nbins, measure_obj.m_max))
+            # for bin1 in range(measure_obj.nbins):
+            #     for bin2 in range(bin1):
+            #         for m in range(measure_obj.m_max):
+            #             zeta_proj_b1_b2_m = np.sum(measure_obj.density_field_data*(measure_obj.conv_M[bin1+m*measure_obj.nbins]*measure_obj.conv_M[bin2+m*measure_obj.nbins].conjugate()))
+            #             PCF_computed[bin1, bin2, m] = zeta_proj_b1_b2_m
+                        # PCF_computed_1d.append(zeta_proj_b1_b2_m) 
+                # conv_M[m,bin,:,:]
+                        
+            PCF_computed = np.zeros((measure_obj.nbins, measure_obj.nbins, measure_obj.m_max)) + 0j
             for bin1 in range(measure_obj.nbins):
                 for bin2 in range(bin1):
                     for m in range(measure_obj.m_max):
-                        zeta_proj_b1_b2_m = np.sum(measure_obj.density_field_data*(measure_obj.conv_M[bin1+m*measure_obj.nbins]*measure_obj.conv_M[bin2+m*measure_obj.nbins].conjugate()))
+                        zeta_proj_b1_b2_m = np.sum(measure_obj.density_field_data*(measure_obj.conv_M[m,bin1,:,:]*measure_obj.conv_M[m,bin2,:,:].conjugate()))
                         PCF_computed[bin1, bin2, m] = zeta_proj_b1_b2_m
-                        # PCF_computed_1d.append(zeta_proj_b1_b2_m)
                         
             PCF_computed_ = PCF_computed.copy()           
             if normalize:
@@ -48,7 +56,7 @@ def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False
                 
         elif measure_obj.nPCF == 4:
             #compute the 4PCF
-            PCF_computed = np.zeros((measure_obj.nbins, measure_obj.nbins, measure_obj.nbins, 2*measure_obj.m_max, 2*measure_obj.m_max))
+            PCF_computed = np.zeros((measure_obj.nbins, measure_obj.nbins, measure_obj.nbins, 2*measure_obj.m_max, 2*measure_obj.m_max)) + 0j
             for bin1 in range(measure_obj.nbins):
                 for bin2 in range(bin1):
                     for bin3 in range(bin2):
