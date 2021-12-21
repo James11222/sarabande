@@ -9,7 +9,12 @@ def test_print():
 def calc_ft_data(measure_obj, normalized=False):
     """
     This function takes the fourier transform of the data
-    """
+
+    Args:
+        measure_obj (class: measure): an object that carries the necessary values and data structures to compute 3/4 PCFs
+        normalized (bool, optional): flag for normalization. Defaults to False.
+
+    """    
     data = measure_obj.density_field_data
     if normalized:
         data = (np.log(data) - np.mean(np.log(data)))/np.std(np.log(data))
@@ -30,7 +35,10 @@ def create_XYZR(measure_obj):
     measure_obj.R 
     to the object. This is effectively a helper function for
     measure_obj.create_radial_bins() and measure_obj.calc_and_save_YLMs()
-    """
+
+    Args:
+        measure_obj (class: measure): an object that carries the necessary values and data structures to compute 3/4 PCFs
+    """    
 
     x = np.linspace(-measure_obj.ld_one_d/2, measure_obj.ld_one_d/2-1 , measure_obj.ld_one_d)
     xsq = x*x
@@ -57,14 +65,30 @@ def create_XYZR(measure_obj):
 def ylm_save(measure_obj, ylm, ell, m):
     """
     Helper function to save ylm
-    """
+
+    Args:
+        measure_obj (class: measure): an object that carries the necessary values and data structures to compute 3/4 PCFs
+        ylm ([ndarray]): YLM array to save to disk
+        ell ([int]): l index of the ylm 
+        m ([int]): m index of the ylm
+    """    
+
     np.save(measure_obj.save_dir +'ylm_'+measure_obj.save_name+'_'+str(ell)+'_'+str(m)+'.npy',ylm)
     del ylm
 
 def ylm_transform_save(measure_obj, ylm_on_shell, ell, m, i):
     """
     Helper function to save ylm_FT
-    """
+
+    Args:
+        measure_obj (class: measure): an object that carries the necessary values and data structures to compute 3/4 PCFs
+        ylm_on_shell ([ndarray]): YLM array to save to disk
+        ell ([int]): l index of the ylm 
+        m ([int]): m index of the ylm
+        i ([int]): radial bin index of the binned ylm
+
+    """  
+
     FT = np.fft.fftn(np.fft.fftshift(ylm_on_shell))
     np.save(measure_obj.save_dir + 'YLMtilde_'+measure_obj.save_name+'_'+str(ell)+'_'+str(m)+'_bin_'+str(i)+'.npy',FT)
     del FT
@@ -79,6 +103,10 @@ def calc_and_save_YLMs(measure_obj):
     ..cu means cubed
     ..ft means to the fourth power
     ..fi means to the fifth power
+
+    Args:
+        measure_obj (class: measure): an object that carries the necessary values and data structures to compute 3/4 PCFs
+
     """
     if hasattr(measure_obj, 'X'):
         X = measure_obj.X
@@ -213,6 +241,10 @@ def calc_and_save_YLMs(measure_obj):
 def create_radial_bins(measure_obj, save_bin_info=True):
     """
     This function creates and saves all the information corresponding to our radial bins
+
+    Args:
+        measure_obj (class: measure): an object that carries the necessary values and data structures to compute 3/4 PCFs
+        save_bin_info ([bool]): a boolean flag to save radial bins to disk
     """
     boundsandnumber = np.zeros((2, measure_obj.nbins+1))
     boundsandnumber[0,:] = measure_obj.bin_edges
@@ -227,6 +259,10 @@ def create_radial_bins(measure_obj, save_bin_info=True):
 def bin_spherical_harmonics(measure_obj,verbose=True):
     """
     This method applies the nbins to the spherical harmonics 
+
+    Args:
+        measure_obj (class: measure): an object that carries the necessary values and data structures to compute 3/4 PCFs
+        verbose ([bool]): flag to display the process of calculation to the user.
     """
     if verbose:
         print("Binning Spherical Harmonics...")
@@ -262,6 +298,12 @@ def calc_a_lm_coeffs(measure_obj,verbose=True, kernel_name = None):
     """
     Calculate the a^b_lm(x) coefficients which is the convolution of the
     density field δ with the binned spherical harmonics. 
+
+    Args:
+        measure_obj (class: measure): an object that carries the necessary values and data structures to compute 3/4 PCFs
+        verbose ([bool]): flag to display the process of calculation to the user.
+        kernel_name ([string]): string for the name we save the kernel as (typically just the save_name)
+        
     """
     binvolume = measure_obj.boundsandnumber[1,0:measure_obj.nbins]
 
@@ -303,9 +345,11 @@ def calc_a_lm_coeffs(measure_obj,verbose=True, kernel_name = None):
         
 def prepare_data(measure_obj, verbose_flag):
         """
-        The flag arguments indicate what you have already calculated. 
-        You may want to skip the ylm or alm creation steps if you've 
-        already calculated them.
+        a helper function for preparing the data for the zeta calculation.
+
+        Args:
+            measure_obj (class: measure): an object that carries the necessary values and data structures to compute 3/4 PCFs
+            verbose_flag ([bool]): flag to display the process of calculation to the user.
         """
         if verbose_flag:
             print("Creating XYZ Grids for radial bin and ylm creation ... \n")
@@ -338,6 +382,12 @@ def prepare_data(measure_obj, verbose_flag):
 ################################################################
 
 def projected_create_bins(measure_obj):
+    """
+    Create radial bins for the projected nPCF. 
+
+    Args:
+        measure_obj (class: measure): an object that carries the necessary values and data structures to compute 3/4 PCFs
+    """    
     x = np.linspace(-measure_obj.ld_one_d/2, measure_obj.ld_one_d/2-1 , measure_obj.ld_one_d)
     xsq = x*x
     m_center = np.where(x==0)[0]# one coordinate of mesh center. this will not work well for odd mesh sizes.
@@ -380,6 +430,12 @@ def projected_create_bins(measure_obj):
     
     
 def projected_create_kernels(measure_obj):
+    """
+    Create kernels for projected nPCF. Essentially creating the binned e^imθ basis
+
+    Args:
+        measure_obj (class: measure): an object that carries the necessary values and data structures to compute 3/4 PCFs
+    """    
     def exp_imtheta_FFT(exp_imtheta, i):
         #note, you have to pass the mth exp_imtheta to this to reduce data transfer overhead
         bin_min = measure_obj.bin_edges[i]
@@ -405,6 +461,12 @@ def projected_create_kernels(measure_obj):
     measure_obj.kernel=exp_imtheta_FFT_M 
     
 def projected_create_Cm_coeffs(measure_obj):
+    """
+    Create the C_m coefficients from the paper. The 2D analog of the a_lmb coefficients.
+
+    Args:
+        measure_obj (class: measure): an object that carries the necessary values and data structures to compute 3/4 PCFs
+    """    
     
     #Compute c_m coefficients
     conv_M = np.zeros((measure_obj.m_max+1, measure_obj.nbins,
@@ -418,10 +480,13 @@ def projected_create_Cm_coeffs(measure_obj):
     
 def projected_prepare_data(measure_obj, verbose_flag):
     """
-    The flag arguments indicate what you have already calculated. 
-    You may want to skip the ylm or alm creation steps if you've 
-    already calculated them.
-    """
+    The projected version of the prepare_data helper function. Designed to 
+    prepare the data for the zeta calculation.
+
+    Args:
+        measure_obj (class: measure): an object that carries the necessary values and data structures to compute 3/4 PCFs
+        verbose_flag ([bool]): flag to display the process of calculation to the user.
+    """    
     if verbose_flag:
         print("Creating Radial Bins ... \n")
     projected_create_bins(measure_obj)

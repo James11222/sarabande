@@ -6,7 +6,25 @@ import pkg_resources
 from .utils import *
 
 def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False):
+    """
+    This function is where the core algorithms take place for measuring the 3/4 PCFs 
+    either projected or not projected. In total there are 4 options
+
+    - projected 3PCF        - projected 4PCF
+    - full 3PCF             - full 4PCF
     
+    Args:
+        measure_obj (class: measure): an object that carries the necessary values and data structures to compute 3/4 PCFs
+        normalize (bool, optional): flag to determine whether we would like to normalize by the bin volume(s). Defaults to True.
+        verbose_flag (bool, optional): flag to walk the user through the full calculation process. Defaults to True.
+        skip_prepare (bool, optional): Flag to determine whether or not we should skip preparing the data (if you already ran the calculation). Defaults to False.
+
+    Raises:
+        AssertionError: in order to calculate the full 4PCF one has to save a boundsandnumber file (this comes from creating radial bins in one of the utility functions.)
+
+    Returns:
+        No Returns, instead we add the zeta attribute to the measure_obj.
+    """    
     
     ##############################################################
     #                Projected Zeta Calculation
@@ -22,15 +40,7 @@ def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False
             
             
         if measure_obj.nPCF == 3:
-            # PCF_computed_1d = []
-            # PCF_computed = np.zeros((measure_obj.nbins, measure_obj.nbins, measure_obj.m_max))
-            # for bin1 in range(measure_obj.nbins):
-            #     for bin2 in range(bin1):
-            #         for m in range(measure_obj.m_max):
-            #             zeta_proj_b1_b2_m = np.sum(measure_obj.density_field_data*(measure_obj.conv_M[bin1+m*measure_obj.nbins]*measure_obj.conv_M[bin2+m*measure_obj.nbins].conjugate()))
-            #             PCF_computed[bin1, bin2, m] = zeta_proj_b1_b2_m
-                        # PCF_computed_1d.append(zeta_proj_b1_b2_m) 
-                # conv_M[m,bin,:,:]
+
                         
             PCF_computed = np.zeros((measure_obj.nbins, measure_obj.nbins, measure_obj.m_max)) + 0j
             for bin1 in range(measure_obj.nbins):
