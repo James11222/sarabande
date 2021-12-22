@@ -1,4 +1,4 @@
-<img src="Images/logo.png" width="40" /> <font size="+20"> **SARABANDE** </font>
+# <img src="Images/logo.png" width="40" />  **SARABANDE**
 
 A useful `python` package to measure the 3/4 PCFs of discrete periodic data in $\mathcal{O}(N_g \log N_g)$ time. This is done using Fast Fourier Transforms.
 
