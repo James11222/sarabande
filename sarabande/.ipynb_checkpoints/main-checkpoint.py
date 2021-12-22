@@ -6,7 +6,7 @@ from .utils import *
 
 class measure:
     
-    def __init__(self, nPCF=4, projected=False, density_field_data = None, save_dir=None, save_name=None, ell_max=5,
+    def __init__(self, nPCF=4, projected=False, m_max=None, density_field_data = None, save_dir=None, save_name=None, ell_max=5,
                  nbins=4, bin_spacing='LIN',bin_min=1, physical_boxsize = None, rmin = None, rmax = None):
         """
         This class allows us to measure the 3/4pcf from some input data field
@@ -15,25 +15,29 @@ class measure:
         self.eps = 1e-15
         self.nbins = nbins
         self.projected = projected
-        
         self.ld_one_d = np.shape(density_field_data)[0]
         self.bin_min = bin_min-1e-5
-        self.bin_max = self.ld_one_d // 2 + 1e-5
-        
+        self.bin_max = (self.ld_one_d // 2) + 1e-5
         ####################################
         #   Initialization Case Handling
         ####################################
         
         if nPCF == 3 or nPCF == 4:
             self.nPCF = nPCF
+            if self.projected:
+                if m_max is None:
+                    raise ValueError("You need to provide an m_max you would like to compute up to.")
+                else:
+                    self.m_max = m_max
+                    
         else:
             raise ValueError("Sarabande only calculates 3 or 4 point correlation functions. Please give an integer 3 or 4.")
 
         
         if physical_boxsize or rmin or rmax is not None:
             if physical_boxsize and rmin and rmax is not None:
-                self.bin_min = (rmin/physical_boxsize)*ld_one_d - 1e-5
-                self.bin_max = (rmax/physical_boxsize)*ld_one_d + 1e-5  
+                self.bin_min = (rmin/physical_boxsize)*self.ld_one_d - 1e-5
+                self.bin_max = (rmax/physical_boxsize)*self.ld_one_d + 1e-5  
             else:
                 raise AssertionError("""If you want to use physical scales, you need to give physical_boxsize, rmin, and rmax""")
         
