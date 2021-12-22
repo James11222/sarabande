@@ -30,16 +30,19 @@ def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False
     #                Projected Zeta Calculation
     ##############################################################
     if measure_obj.projected:
+        start = time.time()
         if not skip_prepare:
             print("""Preparing the data:""")
             projected_prepare_data(measure_obj,verbose_flag)
         else:
             #fix bounds and number scope issue
             measure_obj.kernel_name = measure_obj.save_name
-            measure_obj.boundsandnumber = np.load(measure_obj.save_dir + 'bin_bounds_and_pixel_number_'+measure_obj.save_name+'.npy')
+            # measure_obj.boundsandnumber = np.load(measure_obj.save_dir + 'bin_bounds_and_pixel_number_'+measure_obj.save_name+'.npy')
             
             
         if measure_obj.nPCF == 3:
+            if verbose_flag:
+                print("Starting Calculation of Projected 3PCF.")
 
                         
             PCF_computed = np.zeros((measure_obj.nbins, measure_obj.nbins, measure_obj.m_max)) + 0j
@@ -62,9 +65,15 @@ def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False
             else:
                 measure_obj.zeta = PCF_computed_
                 
+            stop = time.time()
+
+            print("\nFinished Calculating the Projected 3PCF in {0:0.4f} seconds".format(stop - start))
             # coeff_1d = PCF_computed_1d_
                 
         elif measure_obj.nPCF == 4:
+            if verbose_flag:
+                print("Starting Calculation of Projected 4PCF.")
+
             #compute the 4PCF
             PCF_computed = np.zeros((measure_obj.nbins, measure_obj.nbins, measure_obj.nbins, 2*measure_obj.m_max, 2*measure_obj.m_max)) + 0j
             for bin1 in range(measure_obj.nbins):
@@ -76,7 +85,7 @@ def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False
                             else:
                                 c_m1 = (-1)**m1 * measure_obj.conv_M[-m1, bin1, :,:].conjugate()
 
-                            for m2 in range(-m_max,m_max):
+                            for m2 in range(-measure_obj.m_max,measure_obj.m_max):
                                 if m2 > 0:
                                     c_m2 = measure_obj.conv_M[m2, bin2, :,:]
                                 else:
@@ -89,7 +98,7 @@ def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False
                                     if m3 > 0:
                                         c_m3 = measure_obj.conv_M[m3, bin3, :,:]
                                     else:
-                                        c_m3 = (-1)**m3 * conv_M[-m3, bin3, :,:].conjugate()
+                                        c_m3 = (-1)**m3 * measure_obj.conv_M[-m3, bin3, :,:].conjugate()
 
                                     PCF_computed[bin1, bin2, bin3, m1, m2] += np.sum(measure_obj.density_field_data*(c_m1*c_m2*c_m3))
              
@@ -116,6 +125,10 @@ def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False
                 measure_obj.zeta = PCF_computed_
             else:
                 measure_obj.zeta = PCF_computed_
+
+            stop = time.time()
+
+            print("\nFinished Calculating the Projected 4PCF in {0:0.4f} seconds".format(stop - start))
                 
             
     ##############################################################
@@ -128,7 +141,8 @@ def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False
             prepare_data(measure_obj,verbose_flag)
         else:
             measure_obj.kernel_name = measure_obj.save_name
-            measure_obj.boundsandnumber = np.load(measure_obj.save_dir + 'bin_bounds_and_pixel_number_'+measure_obj.save_name+'.npy')
+            # if not hasattr(measure_obj, 'boundsandnumber'):
+            #     measure_obj.boundsandnumber = np.load(measure_obj.save_dir + 'bin_bounds_and_pixel_number_'+measure_obj.save_name+'.npy')
 
 
         if measure_obj.nPCF == 3:
@@ -178,7 +192,10 @@ def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False
                 measure_obj.zeta = zeta
 
             end = time.time()
-            print("3PCF took {0:0.4f} seconds to finish".format(end - start))
+            print("\n3PCF took {0:0.4f} seconds to finish".format(end - start))
+
+            call('rm ' + measure_obj.save_dir + 'bin_bounds_and_pixel_number_'+measure_obj.save_name + '*', shell=True)
+            call('rm ' + measure_obj.save_dir + measure_obj.save_name + 'conv_data_kernel_' + measure_obj.kernel_name + '*', shell=True)
 
 
 

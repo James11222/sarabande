@@ -264,8 +264,6 @@ def bin_spherical_harmonics(measure_obj,verbose=True):
         measure_obj (class: measure): an object that carries the necessary values and data structures to compute 3/4 PCFs
         verbose ([bool]): flag to display the process of calculation to the user.
     """
-    if verbose:
-        print("Binning Spherical Harmonics...")
     for ell in range(0, measure_obj.ell_max+1):
         for m in range(0, ell+1):
             if verbose:
@@ -311,9 +309,6 @@ def calc_a_lm_coeffs(measure_obj,verbose=True, kernel_name = None):
         measure_obj.kernel_name = kernel_name
     else:
         raise AssertionError("You need to give a kernel_name argument value")
-
-    if verbose:
-        print("\nCalculating almb coefficients...\n")
 
     if hasattr(measure_obj, 'ft_data'):
         #CONVOLUTION OF DATA AND SPH_KERNEL AT A GIVEN BIN
@@ -502,6 +497,7 @@ def projected_prepare_data(measure_obj, verbose_flag):
     if verbose_flag:
         print("calculating C_m Coefficients ... \n")
     projected_create_Cm_coeffs(measure_obj)
+
 
 
 
