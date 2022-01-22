@@ -49,8 +49,8 @@ def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False
             for bin1 in range(measure_obj.nbins):
                 for bin2 in range(bin1):
                     for m in range(measure_obj.m_max):
-                        zeta_proj_b1_b2_m = np.sum(measure_obj.density_field_data*(measure_obj.conv_M[m,bin1,:,:]*measure_obj.conv_M[m,bin2,:,:].conjugate()))
-                        PCF_computed[bin1, bin2, m] = zeta_proj_b1_b2_m
+                        PCF_computed[bin1, bin2, m] += np.sum(measure_obj.density_field_data*(measure_obj.conv_M[m,bin1,:,:] * 
+                                                                                            measure_obj.conv_M[m,bin2,:,:].conjugate()))
                         
             PCF_computed_ = PCF_computed.copy()           
             if normalize:
@@ -153,7 +153,7 @@ def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False
 
             for l in range(0, measure_obj.ell_max+1, 1):
                 for bin1 in range(0, measure_obj.nbins, 1):
-                    for bin2 in range(0, bin1+1, 1):
+                    for bin2 in range(0, bin1, 1):
                         for m in range(0,l+1, 1):
                             #load b1 and b2 at this m
 
@@ -178,7 +178,7 @@ def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False
 
             for l in range(0, measure_obj.ell_max+1, 1):
                 for bin1 in range(0, measure_obj.nbins, 1):
-                    for bin2 in range(bin1+1, measure_obj.nbins, 1): #?? for bin2 in range(0, bin2<=bin1, 1):
+                    for bin2 in range(bin1, measure_obj.nbins, 1): #?? for bin2 in range(0, bin2<=bin1, 1):
                         zeta[l, bin1, bin2] = zeta[l, bin2, bin1]
 
 
