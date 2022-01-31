@@ -18,6 +18,7 @@ import time
 from .utils import *
 from .main import measure
 from .full_PCF import calc_zeta
+from .full_PCF_mapped import calc_zeta_mapped
 
 __uri__ = "pending" 
 __author__ = "J. Sunseri"
