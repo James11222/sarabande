@@ -17,9 +17,9 @@ if sys.argv[2] == "projected":
 else:
     projected_flag = False
 
-ells_list = [0, 1, 2]
-ms = [5, 6]
-bins_list = [2, 3]
+ells_list = [0, 1, 2, 3]
+ms = [5, 6, 7, 8, 9, 10, 11, 12]
+bins_list = [2, 3, 4, 5, 6, 7, 8, 9]
 
 ##############################################
 #                Computation
@@ -35,7 +35,7 @@ def main(projected):
         data -= np.mean(data)
         data = data[:,:,10]
 
-        save_dir = os.getcwd() + '/output/'
+        save_dir = '/blue/zslepian/jsunseri/'
 
         PCFs = []
         timing_info = {"m_max":[], "nbins":[], "projected_create_bins":[], "projected_create_kernels":[], "calc_ft_data":[],
@@ -93,9 +93,7 @@ def main(projected):
         data = hdulist[0].data.astype(np.float64)
         data -= np.mean(data)
 
-        data = data[:128,:128,:128]
-
-        save_dir = os.getcwd() + '/output/'
+        save_dir = '/blue/zslepian/jsunseri/'
 
         PCFs = []
         timing_info = {"ell_max": [], "nbins":[], "create_XYZR":[], "create_radial_bins":[], "calc_ft_data":[],
