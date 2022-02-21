@@ -19,6 +19,7 @@ from .utils import *
 from .main import measure
 from .full_PCF import calc_zeta
 from .full_PCF_mapped import calc_zeta_mapped
+from .full_PCF_parallel import calc_zeta_parallel
 
 __uri__ = "pending" 
 __author__ = "J. Sunseri"
