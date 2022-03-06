@@ -2,10 +2,6 @@
 requires = [
     "setuptools>=42",
     "wheel",
-    "numpy",
-    "subprocess",
-    "pkg_resources",
-    "concurrent.futures",
-    "time"
+    "numpy"
 ]
 build-backend = "setuptools.build_meta"
