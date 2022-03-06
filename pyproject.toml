@@ -1,0 +1,11 @@
+[build-system]
+requires = [
+    "setuptools>=42",
+    "wheel",
+    "numpy",
+    "subprocess",
+    "pkg_resources",
+    "concurrent.futures",
+    "time"
+]
+build-backend = "setuptools.build_meta"

@@ -1,0 +1,6 @@
+include *.py
+include *.txt
+include *.md
+include sarabande/*.py
+include sarabande/*.npy
+include MANIFEST.in

@@ -1,6 +1,5 @@
 import numpy as np
 from subprocess import call
-import astropy.io.fits as pyf
 import time
 import pkg_resources
 from .utils import *
