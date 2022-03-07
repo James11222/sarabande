@@ -3,7 +3,7 @@ from subprocess import call
 import time
 import pkg_resources
 import concurrent.futures
-from .utils import *
+from sarabande.utils import *
 
 def calc_zeta_parallel(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False):
     """
@@ -252,7 +252,7 @@ def calc_zeta_parallel(measure_obj, normalize=True, verbose_flag=True, skip_prep
 
             binvolume = measure_obj.boundsandnumber[1,0:nbins]
             zeta = np.zeros((ell_max+1, ell_max+1, ell_max+1,nbins, nbins, nbins)) + 0j
-            stream = pkg_resources.resource_stream(__name__, 'utils/CG_Coeffs.npy')
+            stream = pkg_resources.resource_stream(__name__, 'CG_Coeffs.npy')
             CG_Coefficients = np.load(stream)
 
             indeces = []

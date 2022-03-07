@@ -1,9 +1,7 @@
 import numpy as np
-from .utils import *
+# from sarabande.utils.functions import *
 
 class measure:
-
-    
     def __init__(self, nPCF=4, projected=False, m_max=None, density_field_data = None, 
                  save_dir=None, save_name=None, ell_max=5, nbins=4, bin_spacing='LIN',
                  bin_min=1, physical_boxsize = None, rmin = None, rmax = None):

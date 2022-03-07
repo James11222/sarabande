@@ -12,7 +12,7 @@ here = pathlib.Path(__file__).parent.resolve()
 
 setup(
     name='sarabande',  # Required
-    version='0.0.1',  # Required
+    version='0.0.10',  # Required
     description='Tool for measuring 3/4 PCFs on discrete periodic data.',  # Optional
     long_description=(here / 'README.md').read_text(encoding='utf-8'),  # Optional
     long_description_content_type='text/markdown',  # Optional (see note above)
@@ -49,6 +49,8 @@ setup(
     setup_requires=['pytest-runner'],
     # install_requires=['requests'],  # Optional
     tests_require=['pytest'],
+    include_package_data=True,
+    package_data={'': ['*.npy']},
     project_urls={  # Optional
         'Bug Reports': 'https://github.com/James11222/sarabande/issues',
         'Funding': 'https://donate.pypi.org',
@@ -56,4 +58,3 @@ setup(
         'Source': 'https://github.com/James11222/sarabande/',
     }
 )
-

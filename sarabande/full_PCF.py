@@ -2,7 +2,7 @@ import numpy as np
 from subprocess import call
 import time
 import pkg_resources
-from .utils import *
+from sarabande.utils.functions import *
 
 
 def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False):
