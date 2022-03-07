@@ -1,5 +1,6 @@
 [![codecov](https://codecov.io/gh/James11222/sarabande/branch/main/graph/badge.svg?token=47GPJCFZLE)](https://codecov.io/gh/James11222/sarabande) 
-[![PyPI](https://img.shields.io/pypi/v/sarabande?color=blue%20&label=PyPi%20)]
+![PyPI](https://img.shields.io/pypi/v/sarabande?color=blue%20&label=PyPi%20)
+
 <img src="https://github.com/James11222/sarabande/blob/main/Images/logo_text.png?raw=true" /> 
 
 A useful `python` package to measure the 3/4 PCFs of discrete periodic data in NlogN time. This is done using Fast Fourier Transforms.
