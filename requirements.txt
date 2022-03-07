@@ -1,6 +1,2 @@
 pytest
 numpy
-subprocess
-pkg_resources
-concurrent.futures
-time
