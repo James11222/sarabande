@@ -310,10 +310,9 @@ def calc_zeta_parallel(measure_obj, normalize=True, verbose_flag=True, skip_prep
 
             print("Finished Calculating 4PCF in {0:0.4f} seconds".format(finish-start))
             if normalize:
-                """
-                Normalize zeta^L_B (where L = {\ell_1, \ell_2, \ell_3} and B = {b_1, b_2, b_3}) hat
-                coefficients from calc_zeta by dividing by bin volume
-                """
+                #Normalize zeta^L_B (where L = {\ell_1, \ell_2, \ell_3} and B = {b_1, b_2, b_3}) hat
+                #coefficients from calc_zeta by dividing by bin volume
+                
                 #binvolume = measure_obj.boundsandnumber[1,0:nbins]
                 #normalize_coeff = (binvolume[:,None, None] * binvolume[None,:, None] * binvolume[None, None, :])
                 normalize_coeff = (4.*np.pi)**(3.)

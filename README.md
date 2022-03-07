@@ -1,6 +1,6 @@
-<img src="Images/logo_text.png" /> 
+<img src="https://github.com/James11222/sarabande/blob/main/Images/logo_text.png?raw=true" /> 
 
-A useful `python` package to measure the 3/4 PCFs of discrete periodic data in $\mathcal{O}(N_g \log N_g)$ time. This is done using Fast Fourier Transforms.
+A useful `python` package to measure the 3/4 PCFs of discrete periodic data in NlogN time. This is done using Fast Fourier Transforms.
 
 
 ## Basic Usage:
@@ -37,6 +37,6 @@ Where `**kwargs` can be any of the arguments to the measure constructor function
  ## Workflow:    
 The map of SARABANDE is as follows:
 
-<img src="Images/workflow.png" width="100%" />
+<img src="https://github.com/James11222/sarabande/blob/main/Images/workflow.png?raw=true" width="100%" />
 
 For more information about each algorithm, please read (Sunseri et al. 2022)
