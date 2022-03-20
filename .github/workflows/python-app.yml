@@ -28,6 +28,6 @@ jobs:
     - name: Test with pytes and covt
       run: |
         pip install coverage
-        coverage run -m pytest sarabande/tests/integration_tests.py
+        coverage run -m pytest -v $(ls sarabande/tests/*_tests.py)
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v1
