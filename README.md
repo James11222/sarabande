@@ -42,4 +42,4 @@ The map of SARABANDE is as follows:
 
 <img src="https://github.com/James11222/sarabande/blob/main/Images/workflow.png?raw=true" width="100%" />
 
-For more information about each algorithm, please read (Sunseri et al. 2022)
+For more information about each algorithm, please read (Sunseri et al. 2022 in prep)
