@@ -411,7 +411,10 @@ def projected_create_bins(measure_obj):
     ydivr = Y/R #we'll need these as individuals later anyway.
     del Y
     xpiydivr = xdivr + 1j*ydivr
+    xmiydivr = xdivr - 1j*ydivr
+    
     measure_obj.xpiydivr = xpiydivr
+    measure_obj.xmiydivr = xmiydivr
     measure_obj.R = R
 
     boundsandnumber = np.zeros((2, measure_obj.nbins+1))
@@ -467,7 +470,7 @@ def projected_create_Cm_coeffs(measure_obj):
                        measure_obj.ld_one_d, measure_obj.ld_one_d)) + 0j
     for m in range(0, measure_obj.m_max+1):
         for bin in range(measure_obj.nbins):
-            conv_m = np.fft.ifftn(measure_obj.ft_data*measure_obj.kernel[m,bin,:,:])
+            conv_m = np.fft.ifftn(measure_obj.ft_data*np.conjugate(measure_obj.kernel[m,bin,:,:]))
             conv_M[m,bin,:,:] = conv_m
     measure_obj.conv_M = conv_M
 
