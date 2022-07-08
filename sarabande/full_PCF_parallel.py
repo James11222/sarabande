@@ -173,13 +173,16 @@ def calc_zeta_parallel(measure_obj, normalize=True, verbose_flag=True, skip_prep
                             if m > 0:
                                 ylm_avg += ylm_avg.conjugate() 
                             zeta[l, bin1, bin2] += ylm_avg #now accumulate so we get sum over m.
+                            
 
-            zeta *= 1./(4 * np.pi)
+            # zeta *= 1./(4 * np.pi)
 
             for l in range(0, measure_obj.ell_max+1, 1):
+                zeta[l, :, :] *= ((-1)**l / np.sqrt(2 * l + 1))
                 for bin1 in range(0, measure_obj.nbins, 1):
                     for bin2 in range(bin1, measure_obj.nbins, 1): #?? for bin2 in range(0, bin2<=bin1, 1):
                         zeta[l, bin1, bin2] = zeta[l, bin2, bin1]
+                        
 
 
 
