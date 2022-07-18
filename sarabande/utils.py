@@ -282,13 +282,8 @@ def bin_spherical_harmonics(measure_obj,verbose=True):
                 del ylm_on_shell
             if 'ylm' in globals():
                 del ylm
-#                 file_to_rm = measure_obj.save_dir + 'ylm_'+measure_obj.save_name+'_'+str(ell)+'_'+str(m)+'.npy'
-#                 call(["rm", file_to_rm])
-
 
     call('rm ' + measure_obj.save_dir + 'ylm_' + measure_obj.save_name + '*', shell=True)
-
-
 
 
 def calc_a_lm_coeffs(measure_obj,verbose=True, kernel_name = None):
@@ -323,8 +318,6 @@ def calc_a_lm_coeffs(measure_obj,verbose=True, kernel_name = None):
                     conv = np.fft.ifftn(measure_obj.ft_data*bsph_kernel)
                     del bsph_kernel
                     #a_lm^b coefficients saved here
-                    if measure_obj.nPCF == 4:
-                        conv /= binvolume[bin]
                     np.save(measure_obj.save_dir + measure_obj.save_name+
                             'conv_data_kernel_'+measure_obj.kernel_name+'_'+str(l)+'_'+str(m)+
                           '_bin_'+str(bin)+'.npy', conv)
@@ -468,6 +461,7 @@ def projected_create_Cm_coeffs(measure_obj):
     #Compute c_m coefficients
     conv_M = np.zeros((measure_obj.m_max+1, measure_obj.nbins,
                        measure_obj.ld_one_d, measure_obj.ld_one_d)) + 0j
+
     for m in range(0, measure_obj.m_max+1):
         for bin in range(measure_obj.nbins):
             conv_m = np.fft.ifftn(measure_obj.ft_data*np.conjugate(measure_obj.kernel[m,bin,:,:]))

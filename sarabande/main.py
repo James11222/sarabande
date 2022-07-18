@@ -10,7 +10,7 @@ class measure:
         This class allows us to measure the 3/4pcf from some input data field
 
         Args:
-            nPCF ([int]): Must be either 3 or 4. Determines how many points we use in our nPCF.
+            NPCF ([int]): Must be either 3 or 4. Determines how many points we use in our nPCF.
             projected ([bool]): Flag to determine whether the user wants a projected 3/4 PCF or the Full. Defaults to False.
                 if projected:
                     m_max ([int]): If user chooses projected, we set an m_max (similar to the ell_max in 3D)
@@ -91,6 +91,7 @@ class measure:
         # Physical Boxsize is Optional
         if physical_boxsize or rmin or rmax is not None:
             if physical_boxsize and rmin and rmax is not None:
+                self.boxsize = physical_boxsize
                 self.bin_min = (rmin/physical_boxsize)*self.ld_one_d - 1e-5
                 self.bin_max = (rmax/physical_boxsize)*self.ld_one_d + 1e-5  
             else:
