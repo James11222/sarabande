@@ -141,7 +141,7 @@ def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False
             # Normalization
             #---------------
             if normalize:
-                binvolume = measure_obj.boundsandnumber[1,0:nbins]
+                binvolume = measure_obj.boundsandnumber[1,0:measure_obj.nbins]
                 bin_areas = (binvolume[:,None, None] * binvolume[None,:, None] * binvolume[None, None, :])
                 normalize_coeff = 1 / bin_areas
                 normed_zeta = PCF_computed_ * normalize_coeff 
@@ -222,7 +222,7 @@ def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False
                 # zeta *= 1./(4 * np.pi)
                 binvolume = measure_obj.boundsandnumber[1,0:measure_obj.nbins]
                 bin_volumes = (binvolume[:,None] * binvolume[None,:])
-                normalize_coeff = (1 / bin_volumes) * (measure_obj.boxsize**6 / measure_obj.ld_one_d**9)
+                normalize_coeff = (1 / bin_volumes) #* (measure_obj.boxsize**6 / measure_obj.ld_one_d**9)
                 normed_zeta = zeta * normalize_coeff
                 measure_obj.zeta = normed_zeta
             else:
@@ -348,7 +348,7 @@ def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False
 
                 binvolume = measure_obj.boundsandnumber[1,0:nbins]
                 bin_volumes = (binvolume[:,None, None] * binvolume[None,:, None] * binvolume[None, None, :])
-                normalize_coeff = (1 / bin_volumes) * (measure_obj.boxsize**9 / measure_obj.ld_one_d**12)
+                normalize_coeff = (1 / bin_volumes) #* (measure_obj.boxsize**9 / measure_obj.ld_one_d**12)
                 normed_zeta = zeta * normalize_coeff
                 measure_obj.zeta = normed_zeta
             else: 
