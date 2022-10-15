@@ -34,7 +34,7 @@ def test_bad_data_shape():
         save_dir = os.getcwd() + "/"
         #create measure_obj
         _3PCF = sarabande.measure(nPCF=3, projected=False, density_field_data = data,
-        save_dir=save_dir, save_name='example', nbins=3, ell_max=0)
+        save_dir=save_dir, save_name='example', nbins=3, ell_max=0, normalize=False)
         assert False
     except(AssertionError):
         assert True

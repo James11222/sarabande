@@ -16,7 +16,9 @@ def test_full_3pcf():
         #string to directory to save data into
         save_dir = os.getcwd() + "/"
         #create measure_obj
-        _3PCF = sarabande.measure(nPCF=3, projected=False, density_field_data = data, save_dir=save_dir, save_name='example', nbins=3, ell_max=1)
+        _3PCF = sarabande.measure(nPCF=3, projected=False, density_field_data = data, 
+                                  save_dir=save_dir, save_name='example', nbins=3, ell_max=1,
+                                  normalize=False)
         sarabande.calc_zeta(_3PCF)
         assert True
     except:
@@ -29,7 +31,9 @@ def test_projected_3pcf():
         #string to directory to save data into
         save_dir = os.getcwd() + "/"
         #create measure_obj
-        _3PCF = sarabande.measure(nPCF=3, projected=True, density_field_data = data, save_dir=save_dir, save_name='example', nbins=10, m_max=5)
+        _3PCF = sarabande.measure(nPCF=3, projected=True, density_field_data = data,
+                                  save_dir=save_dir, save_name='example', nbins=10, m_max=5,
+                                  normalize=False)
         sarabande.calc_zeta(_3PCF)
         assert True
     except:
@@ -42,7 +46,9 @@ def test_full_4pcf():
         #string to directory to save data into
         save_dir = os.getcwd() + "/"
         #create measure_obj
-        _4PCF = sarabande.measure(nPCF=4, projected=False, density_field_data = data, save_dir=save_dir, save_name='example', nbins=3, ell_max=1)
+        _4PCF = sarabande.measure(nPCF=4, projected=False, density_field_data = data, 
+                                  save_dir=save_dir, save_name='example', nbins=3, ell_max=1,
+                                  normalize=False)
         sarabande.calc_zeta(_4PCF)
         assert True
     except:
@@ -55,7 +61,9 @@ def test_projected_4pcf():
         #string to directory to save data into
         save_dir = os.getcwd() + "/"
         #create measure_obj
-        _4PCF = sarabande.measure(nPCF=4, projected=True, density_field_data = data, save_dir=save_dir, save_name='example', nbins=10, m_max=5)
+        _4PCF = sarabande.measure(nPCF=4, projected=True, density_field_data = data,
+                                  save_dir=save_dir, save_name='example', nbins=10, m_max=5,
+                                  normalize=False)
         sarabande.calc_zeta(_4PCF)
         assert True
     except:
