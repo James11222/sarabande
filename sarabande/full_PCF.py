@@ -2,7 +2,7 @@ import numpy as np
 from subprocess import call
 import time
 import pkg_resources
-from sarabande.utils.functions import *
+from sarabande.utils import *
 
 
 def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False):
@@ -332,7 +332,7 @@ def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False
                 + 0j
             )
 
-            stream = pkg_resources.resource_stream(__name__, "utils/CG_Coeffs.npy")
+            stream = pkg_resources.resource_stream(__name__, "CG_Coeffs.npy")
             CG_Coefficients = np.load(stream)
             for l_1 in range(0, ell_max + 1):
                 for l_2 in range(0, ell_max + 1):

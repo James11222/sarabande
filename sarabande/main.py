@@ -4,7 +4,7 @@ import numpy as np
 class measure:
     def __init__(self, nPCF=4, projected=False, m_max=None, density_field_data = None, 
                  save_dir=None, save_name=None, ell_max=None, nbins=None, bin_spacing='LIN',
-                 bin_min=1, physical_boxsize = None, rmin = None, rmax = None):
+                 bin_min=1, physical_boxsize = None, rmin = None, rmax = None, normalize=True, particles_on_grid=False):
 
         """
         This class allows us to measure the 3/4pcf from some input data field
@@ -25,6 +25,9 @@ class measure:
             physical_boxsize ([float]): An optional parameter if using a physical scale. The length of one side of the data.
             rmin ([float]): an optional minimum calculation distance (determins bin_min)
             rmax ([float]): an optional maximum calculation distance (determins bin_max)
+            normalize (bool, optional): flag to determine whether we would like to normalize by the bin volume(s). Defaults to True.
+            particles_on_grid (bool, optional): a flag for normalization. 
+            This will assume the data is structured as particles on the grid with weights and a zero background.
      
         """                 
 
@@ -32,6 +35,7 @@ class measure:
         self.eps = 1e-15
         self.nbins = nbins
         self.projected = projected
+        self.normalize = normalize
         
     
         ####################################
@@ -54,8 +58,7 @@ class measure:
                     raise AssertionError("The Full NPCF needs an ell_max not an m_max.")
                 elif ell_max is None:
                     raise AssertionError("The Full NPCF needs an ell_max argument.")
-                
-                    
+                               
         else:
             raise AssertionError("Sarabande only calculates 3 or 4 point correlation functions. Please give an integer 3 or 4.")
         #---------------------------------------------------------
@@ -92,13 +95,36 @@ class measure:
         if physical_boxsize or rmin or rmax is not None:
             if physical_boxsize and rmin and rmax is not None:
                 self.boxsize = physical_boxsize
-                self.bin_min = (rmin/physical_boxsize)*self.ld_one_d - 1e-5
-                self.bin_max = (rmax/physical_boxsize)*self.ld_one_d + 1e-5  
+                self.bin_min = (rmin/physical_boxsize)*self.ld_one_d - self.eps
+                self.bin_max = (rmax/physical_boxsize)*self.ld_one_d + self.eps  
             else:
                 raise AssertionError("""If you want to use physical scales, you need to give physical_boxsize, rmin, and rmax""")
         else:
-            self.bin_min = bin_min-1e-5
-            self.bin_max = (self.ld_one_d // 2) + 1e-5
+            self.bin_min = bin_min - self.eps
+            self.bin_max = (self.ld_one_d // 2) + self.eps
+        #---------------------------------------------------------
+
+        #---------------------------------------------------------
+        # Normalization
+        if self.normalize == True:
+            if particles_on_grid:
+                N_gal = np.sum(self.density_field_data)
+            else:
+                N_gal = np.sum(self.density_field_data + 1)
+                
+            self.N_gal = N_gal
+            if self.projected == True:
+                nbar = (self.N_gal) / self.boxsize**2
+            elif self.projected == False:
+                nbar = (self.N_gal) / self.boxsize**3
+            else:
+                raise AssertionError("""projected argument must be boolean.""")
+            self.nbar = nbar
+        elif self.normalize == False:
+            self.N_gal = None
+            self.nbar = None
+        else:
+            raise AssertionError("""normalize argument must be boolean.""")
         #---------------------------------------------------------
 
         #---------------------------------------------------------

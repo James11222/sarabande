@@ -5,7 +5,7 @@ import pkg_resources
 import concurrent.futures
 from sarabande.utils import *
 
-def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False):
+def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False):
     """
     This function is where the core algorithms take place for measuring the 3/4 PCFs 
     either projected or not projected. In total there are 4 options
@@ -67,10 +67,11 @@ def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False
             #---------------
             # Normalization
             #---------------     
-            if normalize:
+            if measure_obj.normalize:
                 binvolume = measure_obj.boundsandnumber[1,0:measure_obj.nbins]
-                bin_areas = (binvolume[:,None] * binvolume[None,:])
-                normalize_coeff = 1 / bin_areas
+                A_cell = (measure_obj.boxsize / measure_obj.ld_one_d)**2
+                bin_areas = (binvolume[:,None] * binvolume[None,:]) * A_cell**2
+                normalize_coeff = 1 / (measure_obj.N_gal * bin_areas * measure_obj.nbar**2)
                 normed_zeta = PCF_computed_ * normalize_coeff
                 measure_obj.zeta = normed_zeta
             else:
@@ -140,10 +141,11 @@ def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False
             #---------------
             # Normalization
             #---------------
-            if normalize:
+            if measure_obj.normalize:
                 binvolume = measure_obj.boundsandnumber[1,0:measure_obj.nbins]
-                bin_areas = (binvolume[:,None, None] * binvolume[None,:, None] * binvolume[None, None, :])
-                normalize_coeff = 1 / bin_areas
+                A_cell = (measure_obj.boxsize / measure_obj.ld_one_d)**2
+                bin_areas = (binvolume[:,None, None] * binvolume[None,:, None] * binvolume[None, None, :]) * A_cell**3
+                normalize_coeff = 1 / (measure_obj.N_gal * bin_areas * measure_obj.nbar**3)
                 normed_zeta = PCF_computed_ * normalize_coeff 
                 measure_obj.zeta = normed_zeta
             else:
@@ -218,11 +220,11 @@ def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False
             #---------------
             # Normalization
             #---------------
-            if normalize:
-                # zeta *= 1./(4 * np.pi)
+            if measure_obj.normalize:
                 binvolume = measure_obj.boundsandnumber[1,0:measure_obj.nbins]
-                bin_volumes = (binvolume[:,None] * binvolume[None,:])
-                normalize_coeff = (1 / bin_volumes) #* (measure_obj.boxsize**6 / measure_obj.ld_one_d**9)
+                V_cell = (measure_obj.boxsize / measure_obj.ld_one_d)**3
+                bin_volumes = (binvolume[:,None] * binvolume[None,:]) * V_cell**2
+                normalize_coeff = 1 / (measure_obj.N_gal * bin_volumes * measure_obj.nbar**2) 
                 normed_zeta = zeta * normalize_coeff
                 measure_obj.zeta = normed_zeta
             else:
@@ -341,14 +343,11 @@ def calc_zeta(measure_obj, normalize=True, verbose_flag=True, skip_prepare=False
             #---------------
             # Normalization
             #---------------
-            if normalize:  
-
-                # normalize_coeff = (4.*np.pi)**(3.) * (bin_volumes / measure_obj.ld_one_d**3) 
-                # zeta = (normalize_coeff*zeta/((measure_obj.ld_one_d**3)))
-
+            if measure_obj.normalize:  
                 binvolume = measure_obj.boundsandnumber[1,0:nbins]
-                bin_volumes = (binvolume[:,None, None] * binvolume[None,:, None] * binvolume[None, None, :])
-                normalize_coeff = (1 / bin_volumes) #* (measure_obj.boxsize**9 / measure_obj.ld_one_d**12)
+                V_cell = (measure_obj.boxsize / measure_obj.ld_one_d)**3
+                bin_volumes = (binvolume[:,None, None] * binvolume[None,:, None] * binvolume[None, None, :]) * V_cell**3
+                normalize_coeff = 1 / (measure_obj.N_gal * bin_volumes * measure_obj.nbar**3) 
                 normed_zeta = zeta * normalize_coeff
                 measure_obj.zeta = normed_zeta
             else: 

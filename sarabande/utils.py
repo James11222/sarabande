@@ -436,7 +436,7 @@ def projected_create_kernels(measure_obj):
         return np.fft.fftn(np.fft.fftshift(exp_imtheta_on_shell))
 
 
-    exp_imtheta_M = [measure_obj.xpiydivr**m for m in range(0, measure_obj.m_max + 1)]
+    exp_imtheta_M = [measure_obj.xmiydivr**m for m in range(0, measure_obj.m_max + 1)]
 
     #NOW SET UP RADIAL BINS. SET UP BINS, THEN LOAD  YLM, ZERO IT OUT OUTSIDE THE BIN, AND THEN FT AND SAVE.
     exp_imtheta_FFT_M = np.zeros((measure_obj.m_max+1, measure_obj.nbins, 
@@ -464,7 +464,7 @@ def projected_create_Cm_coeffs(measure_obj):
 
     for m in range(0, measure_obj.m_max+1):
         for bin in range(measure_obj.nbins):
-            conv_m = np.fft.ifftn(measure_obj.ft_data*np.conjugate(measure_obj.kernel[m,bin,:,:]))
+            conv_m = np.fft.ifftn(measure_obj.ft_data*measure_obj.kernel[m,bin,:,:])
             conv_M[m,bin,:,:] = conv_m
     measure_obj.conv_M = conv_M
 
