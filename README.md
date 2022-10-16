@@ -1,7 +1,10 @@
 [![codecov](https://codecov.io/gh/James11222/sarabande/branch/main/graph/badge.svg?token=47GPJCFZLE)](https://codecov.io/gh/James11222/sarabande) 
 ![PyPI](https://img.shields.io/pypi/v/sarabande?color=blue%20&label=PyPi%20)
 
-<img src="https://github.com/James11222/sarabande/blob/main/logo/logo_text.png?raw=true" /> 
+<p align="center">
+  <img src="logo/logo_text_dm.png#gh-dark-mode-only" width="100%">
+  <img src="logo/logo_text.png#gh-light-mode-only" width="100%">
+</p>
 
 A useful `python` package to measure the 3/4 PCFs of discrete periodic data in NlogN time. This is done using Fast Fourier Transforms.
 
@@ -40,6 +43,10 @@ Where `**kwargs` can be any of the arguments to the measure constructor function
  ## Workflow:    
 The map of SARABANDE is as follows:
 
-<img src="https://github.com/James11222/sarabande/blob/main/notebooks/paper_figures/workflow.png?raw=true" width="100%" />
+<p align="center">
+  <img src="notebooks/paper_figures/workflow_dm.png#gh-dark-mode-only" width="100%">
+  <img src="notebooks/paper_figures/workflow.png#gh-light-mode-only" width="100%">
+</p>
+
 
 For more information about each algorithm, please read (Sunseri et al. 2022 in prep)
