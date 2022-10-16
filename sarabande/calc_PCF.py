@@ -5,7 +5,7 @@ import pkg_resources
 import concurrent.futures
 from sarabande.utils import *
 
-def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False):
+def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=True):
     """
     This function is where the core algorithms take place for measuring the 3/4 PCFs 
     either projected or not projected. In total there are 4 options
@@ -18,6 +18,7 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False):
         normalize (bool, optional): flag to determine whether we would like to normalize by the bin volume(s). Defaults to True.
         verbose_flag (bool, optional): flag to walk the user through the full calculation process. Defaults to True.
         skip_prepare (bool, optional): Flag to determine whether or not we should skip preparing the data (if you already ran the calculation). Defaults to False.
+        parallelized (bool): when True the Full 4PCF is computed using a parallelized version of the algorithm. We make this an optional flag because concurrent.futures in python is not the most reliable package across machines.
 
     Raises:
         AssertionError: in order to calculate the full 4PCF one has to save a boundsandnumber file (this comes from creating radial bins in one of the utility functions.)
@@ -311,16 +312,20 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False):
                                                             b_1, b_2, b_3))
 
             start = time.time()
-            print("Executing 4PCF Calculation ...")
-
-            #execute map with look up table and sum up results into zeta
-            with concurrent.futures.ProcessPoolExecutor() as executor:
-                results = list(executor.map(load_almb, indeces))
-            executor.shutdown(wait=True)
+            
+            if parallelized == True:
+                #execute map with look up table and sum up results into zeta
+                with concurrent.futures.ProcessPoolExecutor() as executor:
+                    results = list(executor.map(load_almb, indeces))
+                executor.shutdown(wait=True)
+                
+            else:
+                results = list(map(load_almb, indeces))
 
             for j in range(len(results)):
                 l_1, l_2, l_3, b_1, b_2, b_3 = results[j][0]
                 zeta[l_1, l_2, l_3, b_1, b_2, b_3] += results[j][1] 
+                    
 
             #----------------
             # Symmetrization
