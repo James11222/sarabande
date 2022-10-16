@@ -44,6 +44,8 @@ Where `**kwargs` can be any of the arguments to the measure constructor function
 
 We note that the `calc_zeta` method has an optional boolean argument `verbose_flag` which can be toggled on and off depending on if the user wants to see the steps of the code printed.
 
+For an example, please visit the demo notebook in the analysis notebooks folder: `notebooks/Application_Example.ipynb`
+
  ## Workflow:    
 The map of SARABANDE is as follows:
 
