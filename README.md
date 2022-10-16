@@ -33,7 +33,7 @@ Where `**kwargs` can be any of the arguments to the measure constructor function
 * `density_field_data` ([`ndarray`]): A square ndarray of data that is periodic. Must be 2D for projected and 3D for full.
 * `save_dir` ([`string`]): A string to tell the algorithm where to save and store files. All temporary files will be stored here.
 * `save_name` ([`string`]): A string to tell the algorithm what to name the files.
-* `nbins` ([int]): Number of bins to be used in nPCF calculation.
+* `nbins` ([`int`]): Number of bins to be used in nPCF calculation.
 * `bin_spacing` ([`string`]): A string to determine the spacing of bins. Options are `'LIN'`, `'INV'`, or `'LOG'`
 * `bin_min` ([`int`]): The lower bound of the inner most bin. Default is 1. Optional.
 * `physical_boxsize` ([`float`]): An optional parameter if using a physical scale. The length of one side of the data.
@@ -52,5 +52,11 @@ The map of SARABANDE is as follows:
   <img src="notebooks/paper_figures/workflow.png#gh-light-mode-only" width="100%">
 </p>
 
-
 For more information about each algorithm, please read (Sunseri et al. 2022 in prep)
+
+## Coverage [![codecov](https://codecov.io/gh/James11222/sarabande/branch/main/graph/badge.svg?token=47GPJCFZLE)](https://codecov.io/gh/James11222/sarabande) 
+We provide a sunburst plot of the code coverage for sarabande below provided by codecov.io. The inner-most circle is the entire project, moving away from the center are folders then, finally, a single file. The size and color of each slice is representing the number of statements and the coverage, respectively.
+
+<p align="center">
+  <img src="https://codecov.io/gh/James11222/sarabande/branch/main/graphs/sunburst.svg?token=47GPJCFZLE">
+</p>
