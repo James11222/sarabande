@@ -39,6 +39,10 @@ Where `**kwargs` can be any of the arguments to the measure constructor function
 * `physical_boxsize` ([`float`]): An optional parameter if using a physical scale. The length of one side of the data.
 * `rmin` ([`float`]): minimum calculation distance (determins `bin_min`)
 * `rmax` ([`float`]): maximum calculation distance (determins `bin_max`)
+* `normalize` ([`bool`]): A boolean flag to normalize the 3/4 PCFs. Defaults to True. Can't use normalize without giving a `physical_boxsize`, `rmin`, and `rmax` first.
+* `particles_on_grid` ([`bool`]): An optional boolean flag to modify the normalization scheme slightly. This is recommended if you are working with particles on the grid mesh where a given cell corresponds to a particle. 
+
+We note that the `calc_zeta` method has an optional boolean argument `verbose_flag` which can be toggled on and off depending on if the user wants to see the steps of the code printed.
 
  ## Workflow:    
 The map of SARABANDE is as follows:
