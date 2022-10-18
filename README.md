@@ -6,7 +6,7 @@
   <img src="logo/logo_text.png#gh-light-mode-only" width="100%">
 </p>
 
-A useful `python` package to measure the 3/4 PCFs of discrete periodic data in NlogN time. This is done using Fast Fourier Transforms.
+A useful `python` package to measure the 3/4 PCFs of discrete periodic data in NlogN time. This is done using Fast Fourier Transforms. The package is available on PyPi via the command `pip install sarabande`.
 
 
 ## Basic Usage:
