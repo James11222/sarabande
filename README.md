@@ -54,7 +54,7 @@ The map of SARABANDE is as follows:
   <img src="notebooks/paper_figures/workflow.png#gh-light-mode-only" width="100%">
 </p>
 
-For more information about each algorithm, please read (Sunseri et al. 2022 in prep)
+For more information about each algorithm, please read [Sunseri et al. 2022](https://ui.adsabs.harvard.edu/abs/2022arXiv221010206S/abstract)
 
 ## Coverage [![codecov](https://codecov.io/gh/James11222/sarabande/branch/main/graph/badge.svg?token=47GPJCFZLE)](https://codecov.io/gh/James11222/sarabande) 
 We provide a sunburst plot of the code coverage for sarabande below provided by codecov.io. The inner-most circle is the entire project, moving away from the center are folders then, finally, a single file. The size and color of each slice is representing the number of statements and the coverage, respectively.
