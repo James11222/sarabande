@@ -49,7 +49,7 @@ def test_full_4pcf():
         _4PCF = sarabande.measure(nPCF=4, projected=False, density_field_data = data, 
                                   save_dir=save_dir, save_name='example', nbins=3, ell_max=1,
                                   normalize=False)
-        sarabande.calc_zeta(_4PCF)
+        sarabande.calc_zeta(_4PCF, parallelized=False)
         assert True
     except:
         assert False
