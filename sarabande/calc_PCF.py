@@ -5,7 +5,7 @@ import pkg_resources
 import concurrent.futures
 from sarabande.utils import *
 
-def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=True):
+def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=True, checking_install=False):
     """
     This function is where the core algorithms take place for measuring the 3/4 PCFs 
     either projected or not projected. In total there are 4 options
@@ -33,8 +33,11 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
     if measure_obj.projected:
         start = time.time()
         if not skip_prepare:
-            print("""Preparing the data:""")
-            projected_prepare_data(measure_obj,verbose_flag)
+            if checking_install:
+                projected_prepare_data(measure_obj,verbose_flag)
+            else:
+                print("""Preparing the data:""")
+                projected_prepare_data(measure_obj,verbose_flag)
         else:
             #fix bounds and number scope issue
             measure_obj.kernel_name = measure_obj.save_name
@@ -79,7 +82,8 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
                 measure_obj.zeta = PCF_computed_
 
             stop = time.time()
-            print("\nFinished Calculating the Projected 3PCF in {0:0.4f} seconds".format(stop - start))
+            if checking_install == False:
+                print("\nFinished Calculating the Projected 3PCF in {0:0.4f} seconds".format(stop - start))
             # coeff_1d = PCF_computed_1d_
 
         # ---------------------------------------------------------------------------------------------------
@@ -154,7 +158,8 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
 
             stop = time.time()
 
-            print("\nFinished Calculating the Projected 4PCF in {0:0.4f} seconds".format(stop - start))
+            if checking_install == False:
+                print("\nFinished Calculating the Projected 4PCF in {0:0.4f} seconds".format(stop - start))
                 
             
     ##############################################################
@@ -163,8 +168,11 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
     else:
 
         if not skip_prepare:
-            print("""Preparing the data:""")
-            prepare_data(measure_obj,verbose_flag)
+            if checking_install:
+                prepare_data(measure_obj,verbose_flag)
+            else:
+                print("""Preparing the data:""")
+                prepare_data(measure_obj,verbose_flag)
         else:
             measure_obj.kernel_name = measure_obj.save_name
             # if not hasattr(measure_obj, 'boundsandnumber'):
@@ -230,10 +238,12 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
                 measure_obj.zeta = normed_zeta
             else:
                 measure_obj.zeta = zeta
-                print("your zeta coefficients are not properly normalized.")
+                if checking_install == False:
+                    print("your zeta coefficients are not properly normalized.")
 
             end = time.time()
-            print("\n3PCF took {0:0.4f} seconds to finish".format(end - start))
+            if checking_install == False:
+                print("\n3PCF took {0:0.4f} seconds to finish".format(end - start))
 
         # ---------------------------------------------------------------------------------------------------
 
@@ -355,12 +365,14 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
                 normalize_coeff = 1 / (measure_obj.N_gal * bin_volumes * measure_obj.nbar**3) 
                 normed_zeta = zeta * normalize_coeff
                 measure_obj.zeta = normed_zeta
-            else: 
-                print("your zeta coefficients are not properly normalized.")
+            else:
+                if checking_install == False: 
+                    print("your zeta coefficients are not properly normalized.")
                 measure_obj.zeta = zeta  
 
             finish=time.time()
-            print("Finished Calculating 4PCF in {0:0.4f} seconds".format(finish-start))
+            if checking_install == False:
+                print("Finished Calculating 4PCF in {0:0.4f} seconds".format(finish-start))
 
         #------------
         #  Clean Up
