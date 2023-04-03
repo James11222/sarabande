@@ -5,7 +5,8 @@ import pkg_resources
 import concurrent.futures
 from sarabande.utils import *
 
-def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=True, checking_install=False):
+def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=True, 
+              checking_install=False, calc_bin_overlaps=False, calc_odd_modes=False):
     """
     This function is where the core algorithms take place for measuring the 3/4 PCFs 
     either projected or not projected. In total there are 4 options
@@ -18,7 +19,11 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
         normalize (bool, optional): flag to determine whether we would like to normalize by the bin volume(s). Defaults to True.
         verbose_flag (bool, optional): flag to walk the user through the full calculation process. Defaults to True.
         skip_prepare (bool, optional): Flag to determine whether or not we should skip preparing the data (if you already ran the calculation). Defaults to False.
-        parallelized (bool): when True the Full 4PCF is computed using a parallelized version of the algorithm. We make this an optional flag because concurrent.futures in python is not the most reliable package across machines.
+        parallelized (bool): when True the Full 4PCF is computed using a parallelized version of the algorithm. 
+        We make this an optional flag because concurrent.futures in python is not the most reliable package across machines.
+        calc_bin_overlaps (bool): A flag to determine whether any overlap bins should be computed (ex. any possibility where bi = bj (= bk))
+        calc_odd_modes (bool): A flag to determine if sarabande should calculate the odd modes where l1 + l2 + l3 is odd.
+
 
     Raises:
         AssertionError: in order to calculate the full 4PCF one has to save a boundsandnumber file (this comes from creating radial bins in one of the utility functions.)
@@ -178,6 +183,11 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
             # if not hasattr(measure_obj, 'boundsandnumber'):
             #     measure_obj.boundsandnumber = np.load(measure_obj.save_dir + 'bin_bounds_and_pixel_number_'+measure_obj.save_name+'.npy')
 
+        if calc_bin_overlaps == True:
+            diag = 0
+        else: 
+            diag = 1
+
         # ---------------------------------------------------------------------------------------------------
 
         if measure_obj.nPCF == 3:
@@ -289,7 +299,10 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
                 a_lmb_3 = np.load(measure_obj.save_dir + measure_obj.save_name+'conv_data_kernel_'+measure_obj.kernel_name+'_'+str(l_3)+
                                                         '_'+str(m_3)+'_bin_'+str(b_3)+'.npy').astype(np.complex128)
 
-                return [[l_1, l_2, l_3, b_1, b_2, b_3], np.sum(2 * S(m_3) * coupling_w * np.real(a_lmb_1 * a_lmb_2 * a_lmb_3))]
+                if calc_odd_modes == True:
+                    return [[l_1, l_2, l_3, b_1, b_2, b_3], np.sum(2 * S(m_3) * coupling_w * (a_lmb_1 * a_lmb_2 * a_lmb_3))]
+                else:
+                    return [[l_1, l_2, l_3, b_1, b_2, b_3], np.sum(2 * S(m_3) * coupling_w * np.real(a_lmb_1 * a_lmb_2 * a_lmb_3))]
 
             #initialize final storage array
             ell_max = measure_obj.ell_max
@@ -307,7 +320,7 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
             for l_1 in range(0,ell_max+1):
                 for l_2 in range(0,ell_max+1):
                     for l_3 in range(np.abs(l_1 - l_2), min(l_1 + l_2, ell_max)+1):
-                        if (l_1 + l_2 + l_3)%2 != 0: # we don't assume this to be true for Turbulent ISM
+                        if (l_1 + l_2 + l_3)%2 != 0 and calc_odd_modes == False: # odd parity modes option
                             continue
                         for m_1 in range(-l_1, l_1 + 1):
                             for m_2 in range(-l_2, l_2 + 1):
@@ -315,8 +328,8 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
                                 if m_3 > l_3 or m_3 < 0:
                                     continue
                                 for b_1 in range(0, nbins):        
-                                    for b_2 in range(b_1+1, nbins):
-                                        for b_3 in range(b_2+1, nbins):
+                                    for b_2 in range(b_1+diag, nbins):
+                                        for b_3 in range(b_2+diag, nbins):
                                             indeces.append((l_1, l_2, l_3, 
                                                             m_1, m_2, m_3,
                                                             b_1, b_2, b_3))
@@ -346,8 +359,8 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
                         if (l1 + l2 + l3)%2 != 0: # we don't assume this to be true for Turbulent ISM
                             continue
                         for b1 in range(0,nbins):
-                            for b2 in range(b1+1,nbins):
-                                for b3 in range(b2+1,nbins):
+                            for b2 in range(b1+diag,nbins):
+                                for b3 in range(b2+diag,nbins):
                                     this_4pcf = zeta[l1,l2,l3,b1,b2,b3]
                                     zeta[l3,l1,l2,b3,b1,b2] = this_4pcf
                                     zeta[l2,l3,l1,b2,b3,b1] = this_4pcf
