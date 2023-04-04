@@ -6,7 +6,7 @@ import concurrent.futures
 from sarabande.utils import *
 
 def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=True, 
-              checking_install=False, calc_bin_overlaps=False, calc_odd_modes=False):
+              checking_install=False, calc_bin_overlaps=False, calc_odd_modes=False, calc_disconnected=False):
     """
     This function is where the core algorithms take place for measuring the 3/4 PCFs 
     either projected or not projected. In total there are 4 options
@@ -22,7 +22,8 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
         parallelized (bool): when True the Full 4PCF is computed using a parallelized version of the algorithm. 
         We make this an optional flag because concurrent.futures in python is not the most reliable package across machines.
         calc_bin_overlaps (bool): A flag to determine whether any overlap bins should be computed (ex. any possibility where bi = bj (= bk))
-        calc_odd_modes (bool): A flag to determine if sarabande should calculate the odd modes where l1 + l2 + l3 is odd.
+        calc_odd_modes (bool): A flag to determine if we should calculate the odd modes where l1 + l2 + l3 is odd.
+        calc_disconnected (bool): a flag to determine if we should compute the disconnected piece of the 4PCF.
 
 
     Raises:
@@ -280,7 +281,7 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
             def load_almb(index_list):
                 l_1, l_2, l_3, m_1, m_2, m_3, b_1, b_2, b_3 = index_list
 
-                coupling_w = measure_obj.density_field_data * (-1)**(l_1 + l_2 + l_3) * CG_Coefficients[l_1,l_2,l_3,m_1,m_2,m_3]
+                coupling_phase = (-1)**(l_1 + l_2 + l_3) * CG_Coefficients[l_1,l_2,l_3,m_1,m_2,m_3]
 
                 if m_1 < 0:
                     a_lmb_1 = (-1)**m_1 * (np.load(measure_obj.save_dir + measure_obj.save_name+'conv_data_kernel_'+measure_obj.kernel_name+'_'+
@@ -299,10 +300,25 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
                 a_lmb_3 = np.load(measure_obj.save_dir + measure_obj.save_name+'conv_data_kernel_'+measure_obj.kernel_name+'_'+str(l_3)+
                                                         '_'+str(m_3)+'_bin_'+str(b_3)+'.npy').astype(np.complex128)
 
-                if calc_odd_modes == True:
-                    return [[l_1, l_2, l_3, b_1, b_2, b_3], np.sum(2 * S(m_3) * coupling_w * (a_lmb_1 * a_lmb_2 * a_lmb_3))]
+
+                
+
+                if calc_disconnected == True:
+                    disconnected_piece = 2 * S(m_3) * coupling_phase * (np.sum(measure_obj.density_field_data * a_lmb_1) * np.sum(a_lmb_2 * a_lmb_3)
+                                                                      + np.sum(measure_obj.density_field_data * a_lmb_2) * np.sum(a_lmb_3 * a_lmb_1) 
+                                                                      + np.sum(measure_obj.density_field_data * a_lmb_3) * np.sum(a_lmb_1 * a_lmb_2))
                 else:
-                    return [[l_1, l_2, l_3, b_1, b_2, b_3], np.sum(2 * S(m_3) * coupling_w * np.real(a_lmb_1 * a_lmb_2 * a_lmb_3))]
+                    disconnected_piece = 0
+
+                if calc_odd_modes == True and (l1 + l2 + l3)%2 != 0:
+                    full_piece = 2 * S(m_3) * coupling_phase * np.sum(measure_obj.density_field_data * (a_lmb_1 * a_lmb_2 * a_lmb_3))
+                else:
+                    full_piece = 2 * S(m_3) * coupling_phase * np.sum(measure_obj.density_field_data * np.real(a_lmb_1 * a_lmb_2 * a_lmb_3))
+                    disconnected_piece = np.real(disconnected_piece)
+                                                
+
+                
+                return [[l_1, l_2, l_3, b_1, b_2, b_3], full_piece, disconnected_piece]
 
             #initialize final storage array
             ell_max = measure_obj.ell_max
@@ -310,6 +326,7 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
             if hasattr(measure_obj, 'boundsandnumber') == False:
                 raise AssertionError("You need to run measure_obj.create_radial_bins() first!")
             zeta = np.zeros((ell_max+1, ell_max+1, ell_max+1,nbins, nbins, nbins)) + 0j
+            zeta_disconnected = np.zeros((ell_max+1, ell_max+1, ell_max+1,nbins, nbins, nbins)) + 0j
 
             #load in Modified Clebsch-Gordon Coefficients / Wigner-3j Coefficients + Phase
             stream = pkg_resources.resource_stream(__name__, 'CG_Coeffs.npy')
@@ -348,6 +365,7 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
             for j in range(len(results)):
                 l_1, l_2, l_3, b_1, b_2, b_3 = results[j][0]
                 zeta[l_1, l_2, l_3, b_1, b_2, b_3] += results[j][1] 
+                zeta_disconnected[l_1, l_2, l_3, b_1, b_2, b_3] += results[j][2] 
                     
 
             #----------------
@@ -368,6 +386,16 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
                                     zeta[l2,l1,l3,b2,b1,b3] = this_4pcf
                                     zeta[l3,l2,l1,b3,b2,b1] = this_4pcf
 
+                                    if calc_disconnected == True:
+                                        this_4pcf_disconnected = zeta_disconnected[l1,l2,l3,b1,b2,b3]
+                                        zeta_disconnected[l3,l1,l2,b3,b1,b2] = this_4pcf_disconnected
+                                        zeta_disconnected[l2,l3,l1,b2,b3,b1] = this_4pcf_disconnected
+                                        zeta_disconnected[l1,l3,l2,b1,b3,b2] = this_4pcf_disconnected
+                                        zeta_disconnected[l2,l1,l3,b2,b1,b3] = this_4pcf_disconnected
+                                        zeta_disconnected[l3,l2,l1,b3,b2,b1] = this_4pcf_disconnected
+
+
+
             #---------------
             # Normalization
             #---------------
@@ -378,10 +406,16 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
                 normalize_coeff = 1 / (measure_obj.N_gal * bin_volumes * measure_obj.nbar**3) 
                 normed_zeta = zeta * normalize_coeff
                 measure_obj.zeta = normed_zeta
+
+                if calc_disconnected == True:
+                    normed_zeta_disconnected = zeta_disconnected * normalize_coeff
+                    measure_obj.zeta_disconnected = normed_zeta_disconnected
+
             else:
                 if checking_install == False: 
                     print("your zeta coefficients are not properly normalized.")
                 measure_obj.zeta = zeta  
+                measure_obj.zeta_disconnected = zeta_disconnected
 
             finish=time.time()
             if checking_install == False:
