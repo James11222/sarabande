@@ -304,14 +304,15 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
                 
 
                 if calc_disconnected == True:
-                    disconnected_piece = 2 * S(m_3) * coupling_phase * (np.sum(measure_obj.density_field_data * a_lmb_1) * np.sum(a_lmb_2 * a_lmb_3)
-                                                                      + np.sum(measure_obj.density_field_data * a_lmb_2) * np.sum(a_lmb_3 * a_lmb_1) 
-                                                                      + np.sum(measure_obj.density_field_data * a_lmb_3) * np.sum(a_lmb_1 * a_lmb_2))
+                    disconnected_piece = 2 * S(m_3) * coupling_phase * (np.sum(measure_obj.density_field_data * a_lmb_1.conjugate()) * np.sum(a_lmb_2.conjugate() * a_lmb_3.conjugate())
+                                                                      + np.sum(measure_obj.density_field_data * a_lmb_2.conjugate()) * np.sum(a_lmb_3.conjugate() * a_lmb_1.conjugate()) 
+                                                                      + np.sum(measure_obj.density_field_data * a_lmb_3.conjugate()) * np.sum(a_lmb_1.conjugate() * a_lmb_2.conjugate()))
                 else:
                     disconnected_piece = 0
 
                 if calc_odd_modes == True and (l1 + l2 + l3)%2 != 0:
-                    full_piece = 2 * S(m_3) * coupling_phase * np.sum(measure_obj.density_field_data * (a_lmb_1 * a_lmb_2 * a_lmb_3))
+                    full_piece = 2 * S(m_3) * coupling_phase * np.sum(measure_obj.density_field_data * np.imag(a_lmb_1 * a_lmb_2 * a_lmb_3))
+                    disconnected_piece = np.imag(disconnected_piece)
                 else:
                     full_piece = 2 * S(m_3) * coupling_phase * np.sum(measure_obj.density_field_data * np.real(a_lmb_1 * a_lmb_2 * a_lmb_3))
                     disconnected_piece = np.real(disconnected_piece)
@@ -374,7 +375,7 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
             for l1 in range(0,ell_max+1):
                 for l2 in range(0,ell_max+1):
                     for l3 in range(np.abs(l1 - l2), min(l1 + l2, ell_max)+1):
-                        if (l1 + l2 + l3)%2 != 0: # we don't assume this to be true for Turbulent ISM
+                        if (l1 + l2 + l3)%2 != 0 and calc_odd_modes==False: # we don't assume this to be true for Turbulent ISM
                             continue
                         for b1 in range(0,nbins):
                             for b2 in range(b1+diag,nbins):
@@ -387,12 +388,15 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
                                     zeta[l3,l2,l1,b3,b2,b1] = this_4pcf
 
                                     if calc_disconnected == True:
-                                        this_4pcf_disconnected = zeta_disconnected[l1,l2,l3,b1,b2,b3]
+                                        this_4pcf_disconnected = zeta_disconnected[l1,l2,l3,b1,b2,b3] 
                                         zeta_disconnected[l3,l1,l2,b3,b1,b2] = this_4pcf_disconnected
                                         zeta_disconnected[l2,l3,l1,b2,b3,b1] = this_4pcf_disconnected
                                         zeta_disconnected[l1,l3,l2,b1,b3,b2] = this_4pcf_disconnected
                                         zeta_disconnected[l2,l1,l3,b2,b1,b3] = this_4pcf_disconnected
                                         zeta_disconnected[l3,l2,l1,b3,b2,b1] = this_4pcf_disconnected
+
+            # additional factor of Nmesh^3 because of the products of two 2PCFs
+            zeta_disconnected /= measure_obj.ld_one_d**3
 
 
 
