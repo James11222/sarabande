@@ -54,6 +54,8 @@ Where `**kwargs` can be any of the arguments to the measure constructor function
 
 We note that the `calc_zeta` method has an optional boolean argument `verbose_flag` which can be turned on and off depending on if the user wants to see the steps of the code printed. We also add an optional boolean argument `parallelized` which can be turned on and off if the user wishes to compute the Full 4PCF serially. This is added due to the instability of `concurrent.futures` and parallel processing in python across different machines. 
 
+We also provide an implementation of the connected 4PCF, this will be further documented in a future paper.
+
 For an example, please visit the demo notebook in the analysis notebooks folder: `notebooks/Application_Example.ipynb`
 
  ## Workflow:    

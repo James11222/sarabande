@@ -309,6 +309,7 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
                                                                       + np.sum(measure_obj.density_field_data * a_lmb_3.conjugate()) * np.sum(a_lmb_1.conjugate() * a_lmb_2.conjugate()))
                 else:
                     disconnected_piece = 0
+                    
 
                 if calc_odd_modes == True and (l1 + l2 + l3)%2 != 0:
                     full_piece = 2 * S(m_3) * coupling_phase * np.sum(measure_obj.density_field_data * np.imag(a_lmb_1 * a_lmb_2 * a_lmb_3))
