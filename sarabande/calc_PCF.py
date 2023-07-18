@@ -311,7 +311,7 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
                     disconnected_piece = 0
                     
 
-                if calc_odd_modes == True and (l1 + l2 + l3)%2 != 0:
+                if calc_odd_modes == True and (l_1 + l_2 + l_3)%2 != 0:
                     full_piece = 2 * S(m_3) * coupling_phase * np.sum(measure_obj.density_field_data * np.imag(a_lmb_1 * a_lmb_2 * a_lmb_3))
                     disconnected_piece = np.imag(disconnected_piece)
                 else:
