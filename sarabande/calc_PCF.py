@@ -6,7 +6,9 @@ import concurrent.futures
 from sarabande.utils import *
 
 def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=True, 
-              checking_install=False, calc_bin_overlaps=False, calc_odd_modes=False, calc_disconnected=False):
+              checking_install=False, calc_bin_overlaps=False, 
+              calc_odd_modes=False, calc_disconnected=False,
+              store_in_memory=False):
     """
     This function is where the core algorithms take place for measuring the 3/4 PCFs 
     either projected or not projected. In total there are 4 options
@@ -175,14 +177,12 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
 
         if not skip_prepare:
             if checking_install:
-                prepare_data(measure_obj,verbose_flag)
+                prepare_data(measure_obj, store_in_memory, verbose_flag)
             else:
                 print("""Preparing the data:""")
-                prepare_data(measure_obj,verbose_flag)
+                prepare_data(measure_obj, store_in_memory, verbose_flag)
         else:
             measure_obj.kernel_name = measure_obj.save_name
-            # if not hasattr(measure_obj, 'boundsandnumber'):
-            #     measure_obj.boundsandnumber = np.load(measure_obj.save_dir + 'bin_bounds_and_pixel_number_'+measure_obj.save_name+'.npy')
 
         if calc_bin_overlaps == True:
             diag = 0
@@ -210,12 +210,18 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
                     for bin2 in range(0, bin1, 1):
                         for m in range(0,l+1, 1):
                             #load b1 and b2 at this m
+                            if store_in_memory == True:
+                                ylm_b1 = measure_obj.a_lmb[f'l:{l}, m:{m}, bin:{bin1}']
+                                ylm_b1 = ylm_b1.astype(np.complex128)
 
-                            ylm_b1 = np.load(measure_obj.save_dir + measure_obj.save_name +'conv_data_kernel_'+measure_obj.kernel_name+'_'+str(l)+
-                                             '_'+str(m)+'_bin_'+str(bin1)+'.npy').astype(np.complex128)
-                            ylm_b2 = np.load(measure_obj.save_dir + measure_obj.save_name+'conv_data_kernel_'+measure_obj.kernel_name+'_'+str(l)+
-                                             '_'+str(m)+'_bin_'+str(bin2)+'.npy').astype(np.complex128)
-                            #form half of sum at that m.
+                                ylm_b2 = measure_obj.a_lmb[f'l:{l}, m:{m}, bin:{bin2}']
+                                ylm_b2 = ylm_b2.astype(np.complex128)
+                            else:
+                                ylm_b1 = np.load(measure_obj.save_dir + measure_obj.save_name +'conv_data_kernel_'+measure_obj.kernel_name+'_'+str(l)+
+                                                '_'+str(m)+'_bin_'+str(bin1)+'.npy').astype(np.complex128)
+                                ylm_b2 = np.load(measure_obj.save_dir + measure_obj.save_name+'conv_data_kernel_'+measure_obj.kernel_name+'_'+str(l)+
+                                                '_'+str(m)+'_bin_'+str(bin2)+'.npy').astype(np.complex128)
+                                #form half of sum at that m.
                             ylm_b1 *= ylm_b2.conjugate()
                             del ylm_b2
 
@@ -283,22 +289,36 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
 
                 coupling_phase = (-1)**(l_1 + l_2 + l_3) * CG_Coefficients[l_1,l_2,l_3,m_1,m_2,m_3]
 
-                if m_1 < 0:
-                    a_lmb_1 = (-1)**m_1 * (np.load(measure_obj.save_dir + measure_obj.save_name+'conv_data_kernel_'+measure_obj.kernel_name+'_'+
-                                                str(l_1)+'_'+str(-m_1)+'_bin_'+str(b_1)+'.npy').astype(np.complex128)).conjugate()                                  
-                else:
-                    a_lmb_1 = np.load(measure_obj.save_dir + measure_obj.save_name+'conv_data_kernel_'+measure_obj.kernel_name+'_'+str(l_1)+
-                                                    '_'+str(m_1)+'_bin_'+str(b_1)+'.npy').astype(np.complex128)
+                if store_in_memory == True:
+                    if m_1 < 0:
+                        a_lmb_1 = (-1)**m_1 * (measure_obj.a_lmb[f'l:{l_1}, m:{-m_1}, bin:{b_1}']).astype(np.complex128).conjugate()                                  
+                    else:
+                        a_lmb_1 = (measure_obj.a_lmb[f'l:{l_1}, m:{m_1}, bin:{b_1}']).astype(np.complex128)
 
-                if m_2 < 0:
-                    a_lmb_2 = (-1)**m_2 * (np.load(measure_obj.save_dir + measure_obj.save_name+'conv_data_kernel_'+measure_obj.kernel_name+'_'+
-                                                    str(l_2)+'_'+str(-m_2)+'_bin_'+str(b_2)+'.npy').astype(np.complex128)).conjugate()                               
-                else:
-                    a_lmb_2 = np.load(measure_obj.save_dir + measure_obj.save_name+'conv_data_kernel_'+measure_obj.kernel_name+'_'+str(l_2)+
-                                                        '_'+str(m_2)+'_bin_'+str(b_2)+'.npy').astype(np.complex128)
+                    if m_2 < 0:
+                        a_lmb_2 = (-1)**m_2 * (measure_obj.a_lmb[f'l:{l_2}, m:{-m_2}, bin:{b_2}']).astype(np.complex128).conjugate()                               
+                    else:
+                        a_lmb_2 = (measure_obj.a_lmb[f'l:{l_2}, m:{m_2}, bin:{b_2}']).astype(np.complex128)
 
-                a_lmb_3 = np.load(measure_obj.save_dir + measure_obj.save_name+'conv_data_kernel_'+measure_obj.kernel_name+'_'+str(l_3)+
-                                                        '_'+str(m_3)+'_bin_'+str(b_3)+'.npy').astype(np.complex128)
+                    a_lmb_3 = (measure_obj.a_lmb[f'l:{l_3}, m:{m_3}, bin:{b_3}']).astype(np.complex128)
+
+                else:
+                    if m_1 < 0:
+                        a_lmb_1 = (-1)**m_1 * (np.load(measure_obj.save_dir + measure_obj.save_name+'conv_data_kernel_'+measure_obj.kernel_name+'_'+
+                                                    str(l_1)+'_'+str(-m_1)+'_bin_'+str(b_1)+'.npy').astype(np.complex128)).conjugate()                                  
+                    else:
+                        a_lmb_1 = np.load(measure_obj.save_dir + measure_obj.save_name+'conv_data_kernel_'+measure_obj.kernel_name+'_'+str(l_1)+
+                                                        '_'+str(m_1)+'_bin_'+str(b_1)+'.npy').astype(np.complex128)
+
+                    if m_2 < 0:
+                        a_lmb_2 = (-1)**m_2 * (np.load(measure_obj.save_dir + measure_obj.save_name+'conv_data_kernel_'+measure_obj.kernel_name+'_'+
+                                                        str(l_2)+'_'+str(-m_2)+'_bin_'+str(b_2)+'.npy').astype(np.complex128)).conjugate()                               
+                    else:
+                        a_lmb_2 = np.load(measure_obj.save_dir + measure_obj.save_name+'conv_data_kernel_'+measure_obj.kernel_name+'_'+str(l_2)+
+                                                            '_'+str(m_2)+'_bin_'+str(b_2)+'.npy').astype(np.complex128)
+
+                    a_lmb_3 = np.load(measure_obj.save_dir + measure_obj.save_name+'conv_data_kernel_'+measure_obj.kernel_name+'_'+str(l_3)+
+                                                            '_'+str(m_3)+'_bin_'+str(b_3)+'.npy').astype(np.complex128)
 
 
                 
@@ -430,7 +450,9 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
         #  Clean Up
         #------------
         call('rm ' + measure_obj.save_dir + 'bin_bounds_and_pixel_number_'+measure_obj.save_name + '*', shell=True)
-        call('rm ' + measure_obj.save_dir + measure_obj.save_name + 'conv_data_kernel_' + measure_obj.kernel_name + '*', shell=True)
+
+        if store_in_memory == False:
+            call('rm ' + measure_obj.save_dir + measure_obj.save_name + 'conv_data_kernel_' + measure_obj.kernel_name + '*', shell=True)
   
 
 

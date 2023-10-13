@@ -12,7 +12,7 @@ here = pathlib.Path(__file__).parent.resolve()
 
 setup(
     name='sarabande',  # Required
-    version='1.0.1',  # Required
+    version='1.1.0',  # Required
     description='Tool for measuring 3/4 PCFs on discrete periodic data.',  # Optional
     long_description=(here / 'README.md').read_text(encoding='utf-8'),  # Optional
     long_description_content_type='text/markdown',  # Optional (see note above)

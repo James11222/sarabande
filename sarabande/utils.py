@@ -286,7 +286,7 @@ def bin_spherical_harmonics(measure_obj,verbose=True):
     call('rm ' + measure_obj.save_dir + 'ylm_' + measure_obj.save_name + '*', shell=True)
 
 
-def calc_a_lm_coeffs(measure_obj,verbose=True, kernel_name = None):
+def calc_a_lm_coeffs(measure_obj, store_in_memory, verbose=True, kernel_name = None):
     """
     Calculate the a^b_lm(x) coefficients which is the convolution of the
     density field δ with the binned spherical harmonics. 
@@ -298,6 +298,7 @@ def calc_a_lm_coeffs(measure_obj,verbose=True, kernel_name = None):
         
     """
     binvolume = measure_obj.boundsandnumber[1,0:measure_obj.nbins]
+    measure_obj.a_lmb = {}
 
     if kernel_name is not None:
         measure_obj.kernel_name = kernel_name
@@ -317,8 +318,12 @@ def calc_a_lm_coeffs(measure_obj,verbose=True, kernel_name = None):
                                         '_bin_'+str(bin)+'.npy')
                     conv = np.fft.ifftn(measure_obj.ft_data*bsph_kernel)
                     del bsph_kernel
-                    #a_lm^b coefficients saved here
-                    np.save(measure_obj.save_dir + measure_obj.save_name+
+
+                    if store_in_memory == True:
+                        measure_obj.a_lmb[f'l:{l}, m:{m}, bin:{bin}'] = conv
+                    else:
+                        #a_lm^b coefficients saved here
+                        np.save(measure_obj.save_dir + measure_obj.save_name+
                             'conv_data_kernel_'+measure_obj.kernel_name+'_'+str(l)+'_'+str(m)+
                           '_bin_'+str(bin)+'.npy', conv)
                     del conv
@@ -330,7 +335,7 @@ def calc_a_lm_coeffs(measure_obj,verbose=True, kernel_name = None):
         
         
         
-def prepare_data(measure_obj, verbose_flag):
+def prepare_data(measure_obj, verbose_flag, store_in_memory):
         """
         a helper function for preparing the data for the zeta calculation.
 
@@ -360,7 +365,7 @@ def prepare_data(measure_obj, verbose_flag):
         
         if verbose_flag:
             print("calculating a_lm coefficients ... \n")
-        calc_a_lm_coeffs(measure_obj, verbose=verbose_flag, kernel_name=measure_obj.save_name)
+        calc_a_lm_coeffs(measure_obj, store_in_memory, verbose=verbose_flag, kernel_name=measure_obj.save_name)
         
 
 
