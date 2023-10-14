@@ -335,7 +335,7 @@ def calc_a_lm_coeffs(measure_obj, store_in_memory, verbose=True, kernel_name = N
         
         
         
-def prepare_data(measure_obj, verbose_flag, store_in_memory):
+def prepare_data(measure_obj, store_in_memory, verbose_flag):
         """
         a helper function for preparing the data for the zeta calculation.
 
