@@ -8,7 +8,7 @@ from sarabande.utils import *
 def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=True, 
               checking_install=False, calc_bin_overlaps=False, 
               calc_odd_modes=False, calc_disconnected=False,
-              store_in_memory=False):
+              store_in_memory=False, max_workers=1):
     """
     This function is where the core algorithms take place for measuring the 3/4 PCFs 
     either projected or not projected. In total there are 4 options
@@ -377,7 +377,7 @@ def calc_zeta(measure_obj, verbose_flag=True, skip_prepare=False, parallelized=T
             
             if parallelized == True:
                 #execute map with look up table and sum up results into zeta
-                with concurrent.futures.ProcessPoolExecutor() as executor:
+                with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
                     results = list(executor.map(load_almb, indeces))
                 executor.shutdown(wait=True)
                 
